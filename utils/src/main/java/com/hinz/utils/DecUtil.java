@@ -27,10 +27,11 @@ public class DecUtil {
             }
             try {
                 System.out.println("解密 begin ======================>");
+                long begin = System.currentTimeMillis();
                 File decFile = File.createTempFile("dec" ,""+ new Random().nextInt());
                 transfer(file,decFile);
                 decFile.delete();
-                System.out.println("解密 end ======================>");
+                System.out.println("解密 end ======================>"+"\"总耗时\" = " + (System.currentTimeMillis()-begin));
             } catch (Exception e) {
                 e.printStackTrace();
             }
