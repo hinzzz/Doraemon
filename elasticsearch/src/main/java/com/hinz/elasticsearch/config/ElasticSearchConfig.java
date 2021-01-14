@@ -4,6 +4,7 @@ import org.apache.http.HttpHost;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -21,12 +22,13 @@ public class ElasticSearchConfig {
         COMMON_OPTIONS = builder.build();
     }
 
+    @Bean
     public RestHighLevelClient esRestClient(){
         /**集群可以配置多个HttpHost*/
         /*RestHighLevelClient client = new RestHighLevelClient(
                 RestClient.builder(
-                        new HttpHost("localhost", 9200, "http"),
                         new HttpHost("localhost", 9201, "http"))
+                        new HttpHost("localhost", 9200, "http"),
         );*/
         RestHighLevelClient client = new RestHighLevelClient(
                 RestClient.builder(
