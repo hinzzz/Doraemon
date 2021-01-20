@@ -28,13 +28,12 @@ public class LambdaTest {
         /**
          * 使用lambda
          */
-        Comparator<Integer> cpt1 = (x,y)->{ Integer.compare(x,y);};
+        Comparator<Integer> cpt1 = (x,y)->{ return Integer.compare(x,y);};
         TreeSet<Integer> set1 = new TreeSet<Integer>(cpt1);
 
         HelloFunctionalInterface h1 = () -> {  return "" + 1 ;};
         HelloFunctionalInterface h2 = () -> "" + 1 ;
         HelloFunctionalInterface h3 = () -> { return null; };
-
 
     }
 }
