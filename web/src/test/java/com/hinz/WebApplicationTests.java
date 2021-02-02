@@ -1,4 +1,4 @@
-package com.hinz.web;
+package com.hinz;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
