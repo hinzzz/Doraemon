@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hinz.mybatis.mapper.user.UserInfoDAO">
+  <resultMap id="BaseResultMap" type="com.hinz.mybatis.bean.user.UserInfo">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="account" jdbcType="VARCHAR" property="account" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nick_name" />
+    <result column="invite_code" jdbcType="VARCHAR" property="invite_code" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="password_salt" jdbcType="VARCHAR" property="password_salt" />
+    <result column="mobile_no" jdbcType="VARCHAR" property="mobile_no" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="create_time" />
+    <result column="last_update_time" jdbcType="TIMESTAMP" property="last_update_time" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, account, nick_name, invite_code, `password`, password_salt, mobile_no, email,
+    create_time, last_update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from user_info
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from user_info
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.hinz.mybatis.bean.user.UserInfo">
+    insert into user_info (id, account, nick_name,
+      invite_code, `password`, password_salt,
+      mobile_no, email, create_time,
+      last_update_time)
+    values (#{id,jdbcType=BIGINT}, #{account,jdbcType=VARCHAR}, #{nick_name,jdbcType=VARCHAR},
+      #{invite_code,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{password_salt,jdbcType=VARCHAR},
+      #{mobile_no,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{create_time,jdbcType=TIMESTAMP},
+      #{last_update_time,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.hinz.mybatis.bean.user.UserInfo">
+    insert into user_info
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="account != null">
+        account,
+      </if>
+      <if test="nick_name != null">
+        nick_name,
+      </if>
+      <if test="invite_code != null">
+        invite_code,
+      </if>
+      <if test="password != null">
+        `password`,
+      </if>
+      <if test="password_salt != null">
+        password_salt,
+      </if>
+      <if test="mobile_no != null">
+        mobile_no,
+      </if>
+      <if test="email != null">
+        email,
+      </if>
+      <if test="create_time != null">
+        create_time,
+      </if>
+      <if test="last_update_time != null">
+        last_update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="account != null">
+        #{account,jdbcType=VARCHAR},
+      </if>
+      <if test="nick_name != null">
+        #{nick_name,jdbcType=VARCHAR},
+      </if>
+      <if test="invite_code != null">
+        #{invite_code,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="password_salt != null">
+        #{password_salt,jdbcType=VARCHAR},
+      </if>
+      <if test="mobile_no != null">
+        #{mobile_no,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="create_time != null">
+        #{create_time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="last_update_time != null">
+        #{last_update_time,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.hinz.mybatis.bean.user.UserInfo">
+    update user_info
+    <set>
+      <if test="account != null">
+        account = #{account,jdbcType=VARCHAR},
+      </if>
+      <if test="nick_name != null">
+        nick_name = #{nick_name,jdbcType=VARCHAR},
+      </if>
+      <if test="invite_code != null">
+        invite_code = #{invite_code,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        `password` = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="password_salt != null">
+        password_salt = #{password_salt,jdbcType=VARCHAR},
+      </if>
+      <if test="mobile_no != null">
+        mobile_no = #{mobile_no,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="create_time != null">
+        create_time = #{create_time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="last_update_time != null">
+        last_update_time = #{last_update_time,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.hinz.mybatis.bean.user.UserInfo">
+    update user_info
+    set account = #{account,jdbcType=VARCHAR},
+      nick_name = #{nick_name,jdbcType=VARCHAR},
+      invite_code = #{invite_code,jdbcType=VARCHAR},
+      `password` = #{password,jdbcType=VARCHAR},
+      password_salt = #{password_salt,jdbcType=VARCHAR},
+      mobile_no = #{mobile_no,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR},
+      create_time = #{create_time,jdbcType=TIMESTAMP},
+      last_update_time = #{last_update_time,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>
