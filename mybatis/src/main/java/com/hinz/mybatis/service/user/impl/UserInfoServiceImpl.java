@@ -1,5 +1,8 @@
 package com.hinz.mybatis.service.user.impl;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.hinz.mybatis.bean.user.UserInfo;
+import com.hinz.mybatis.mapper.user.UserInfoMapper;
 import com.hinz.mybatis.service.user.UserInfoService;
 import org.springframework.stereotype.Service;
 
@@ -9,6 +12,6 @@ import org.springframework.stereotype.Service;
  * @Description : No Description
  */
 @Service
-public class UserInfoServiceImpl implements UserInfoService {
+public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> implements UserInfoService {
 
 }

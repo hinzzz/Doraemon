@@ -2,13 +2,18 @@ package com.hinz.mybatis.bean.user;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import lombok.Data;
+
+import lombok.*;
 
 /**
- * @author
+ * @author hinzzz
  *
  */
+@Builder
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class UserInfo implements Serializable {
     private Long id;
 
@@ -20,12 +25,12 @@ public class UserInfo implements Serializable {
     /**
      * 昵称
      */
-    private String nick_name;
+    private String nickName;
 
     /**
      * 邀请码
      */
-    private String invite_code;
+    private String inviteCode;
 
     /**
      * 密码
@@ -35,12 +40,12 @@ public class UserInfo implements Serializable {
     /**
      * 密码盐
      */
-    private String password_salt;
+    private String passwordSalt;
 
     /**
      * 手机号
      */
-    private String mobile_no;
+    private String mobileNo;
 
     /**
      * 邮箱
@@ -50,12 +55,12 @@ public class UserInfo implements Serializable {
     /**
      * 创建时间
      */
-    private LocalDateTime create_time;
+    private LocalDateTime createTime;
 
     /**
      * 最后更新时间
      */
-    private LocalDateTime last_update_time;
+    private LocalDateTime lastUpdateTime;
 
     private static final long serialVersionUID = 1L;
 }

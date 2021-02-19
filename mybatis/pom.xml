@@ -19,11 +19,20 @@
 	</properties>
 	<dependencies>
 
+		<!--        mybatis-plus-->
 		<dependency>
-			<groupId>org.mybatis.spring.boot</groupId>
-			<artifactId>mybatis-spring-boot-starter</artifactId>
-			<version>${mybatis.spring.boot.version}</version>
+			<groupId>com.baomidou</groupId>
+			<artifactId>mybatis-plus-boot-starter</artifactId>
+			<version>3.2.0</version>
 		</dependency>
+
+		<!--    导入mysql驱动    -->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>8.0.17</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>org.projectlombok</groupId>
