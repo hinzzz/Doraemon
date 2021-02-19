@@ -1,21 +1,21 @@
 POST http://127.0.0.1:8080/valid/add
 Content-Type: application/json
 
-{ "id":1235, "userName":"", "age":0, "mobileNo":"123", "gender":3, "homeUrl":"12312312" }
+{ "id":null, "userName":null, "age":null, "mobileNo":null, "gender":3, "homeUrl":"12312312" }
 
 ###
 
 POST http://127.0.0.1:8080/valid/update
 Content-Type: application/json
 
-{ "id":null, "userName":"", "age":0, "mobileNo":"123", "gender":3, "homeUrl":"12312312" }
+{ "id":1, "userName":null, "age":0, "mobileNo":null, "gender":3, "homeUrl":"12312312" }
 
 ###
 
 POST http://127.0.0.1:8080/valid/test
 Content-Type: application/json
 
-{ "id":null, "userName":"", "age":0, "mobileNo":"123", "gender":3, "homeUrl":"12312312" }
+{ "id":null, "userName":null, "age":null, "mobileNo":"15989197190", "gender":3, "homeUrl":"12312312" ,"addressInfos": [{ "id":123123, "description": "123" }],"flag":false}
 
 ###
 
@@ -26,3 +26,9 @@ Content-Type: application/json
 { "id":123123, "description": "123" }
 
 ###
+
+GET http://127.0.0.1:8080/valid/testSingleParam?name=
+
+
+###
+

@@ -19,7 +19,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = { GenderValueConstraintValidator.class })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
-public @interface GenderValue {
+public @interface IntValue {
 
     String message() default "{com.hinz.jsr3.valid.GenderValue.message}";
 
