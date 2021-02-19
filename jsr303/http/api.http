@@ -1,0 +1,28 @@
+POST http://127.0.0.1:8080/valid/add
+Content-Type: application/json
+
+{ "id":1235, "userName":"", "age":0, "mobileNo":"123", "gender":3, "homeUrl":"12312312" }
+
+###
+
+POST http://127.0.0.1:8080/valid/update
+Content-Type: application/json
+
+{ "id":null, "userName":"", "age":0, "mobileNo":"123", "gender":3, "homeUrl":"12312312" }
+
+###
+
+POST http://127.0.0.1:8080/valid/test
+Content-Type: application/json
+
+{ "id":null, "userName":"", "age":0, "mobileNo":"123", "gender":3, "homeUrl":"12312312" }
+
+###
+
+
+POST http://127.0.0.1:8080/valid/testAddr
+Content-Type: application/json
+
+{ "id":123123, "description": "123" }
+
+###

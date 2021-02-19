@@ -2,7 +2,6 @@ package com.hinz.mybatis.service;
 
 import com.hinz.mybatis.mapper.MyBatisBaseDao;
 
-import java.io.Serializable;
 
 /**
  * @author ：quanhz
