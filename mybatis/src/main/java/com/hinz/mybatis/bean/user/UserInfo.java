@@ -2,6 +2,7 @@ package com.hinz.mybatis.bean.user;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import lombok.*;
 
@@ -61,6 +62,8 @@ public class UserInfo implements Serializable {
      * 最后更新时间
      */
     private LocalDateTime lastUpdateTime;
+
+    private List<UserAddress> userAddressList;
 
     private static final long serialVersionUID = 1L;
 }

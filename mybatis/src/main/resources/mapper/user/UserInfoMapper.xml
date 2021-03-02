@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hinz.mybatis.mapper.user.UserInfoMapper" >
+    <!--
+        namespace:名称空间;指定为接口的全类名
+        id：唯一标识
+        resultType：返回值类型
+        #{id}：从传递过来的参数中取出id值
+        public Employee getEmpById(Integer id);
+     -->
+
+    <resultMap id="userResult" type="com.hinz.mybatis.bean.user.UserInfo">
+        <result column="id" property="id"/>
+        <result column="account" property="account"/>
+        <result column="nick_name" property="nickName"/>
+        <result column="invite_code" property="inviteCode"/>
+        <result column="password" property="password"/>
+        <result column="password_salt" property="passwordSalt"/>
+        <result column="mobile_no" property="mobileNo"/>
+        <result column="email" property="email"/>
+        <result column="create_time" property="createTime"/>
+        <!--
+			collection定义关联集合类型的属性的封装规则
+			ofType:指定集合里面元素的类型
+			<id>必须为嵌套属性的主键
+		-->
+        <collection property="userAddressList"  ofType="com.hinz.mybatis.bean.user.UserAddress" >
+            <id  column="aid" property="id"/>
+            <result column="detail_address" property="detailAddress"/>
+        </collection>
+    </resultMap>
+
+    <select id="getUserInfoAddress" parameterType="Long" resultMap="userResult">
+        select ui.*,ua.id aid,ua.id aid, ua.account,ua.detail_address from user_info ui left join user_address  ua on ui.account = ua.account where ui.id=#{userId}
+    </select>
+
+
+    <resultMap id="userResult2" type="com.hinz.mybatis.bean.user.UserInfo">
+        <result column="id" property="id"/>
+        <result column="account" property="account"/>
+        <result column="nick_name" property="nickName"/>
+        <result column="invite_code" property="inviteCode"/>
+        <result column="password" property="password"/>
+        <result column="password_salt" property="passwordSalt"/>
+        <result column="mobile_no" property="mobileNo"/>
+        <result column="email" property="email"/>
+        <result column="create_time" property="createTime"/>
+        <!--
+			分段查询
+			fetchType="lazy"：表示使用延迟加载；
+				- lazy：延迟
+				- eager：立即
+			column 多个参数可构造成map,column="{paramAccount=account,pid=id}"传入 account和id都为主表的字段
+			       单个参数column="account"
+		-->
+        <collection property="userAddressList" column="account" fetchType="eager"  select="com.hinz.mybatis.mapper.user.UserInfoMapper.getAddress" >
+        </collection>
+    </resultMap>
+
+    <select id="getUserInfoAddress2" parameterType="String" resultMap="userResult2">
+        select * from user_info
+        <where>
+            <if test="account!=null">
+                and account=#{account}
+            </if>
+        </where>
+
+
+    </select>
+
+    <select id="getAddress" parameterType="String" resultType="com.hinz.mybatis.bean.user.UserInfo">
+        select * from user_address where account=#{paramAccount}
+    </select>
+
+    <!-- parameterType：参数类型，可以省略，
+	获取自增主键的值：
+		mysql支持自增主键，自增主键值的获取，mybatis也是利用statement.getGenreatedKeys()；
+		useGeneratedKeys="true"；使用自增主键获取主键值策略
+		keyProperty；指定对应的主键属性，也就是mybatis获取到主键值以后，将这个值封装给javaBean的哪个属性
+	-->
+    <insert id="addUserInfo" parameterType="com.hinz.mybatis.bean.user.UserInfo"
+            useGeneratedKeys="true" keyProperty="id" databaseId="mysql">
+        insert into user_info(account,email,nick_name)
+        values(#{account},#{email},#{nickName})
+    </insert>
+
+    <!--
+获取非自增主键的值：
+    Oracle不支持自增；Oracle使用序列来模拟自增；
+    每次插入的数据的主键是从序列中拿到的值；如何获取到这个值；
+ -->
+    <!--<insert id="addEmp" databaseId="oracle">
+        &lt;!&ndash;
+        keyProperty:查出的主键值封装给javaBean的哪个属性
+        order="BEFORE":当前sql在插入sql之前运行
+               AFTER：当前sql在插入sql之后运行
+        resultType:查出的数据的返回值类型
+
+        BEFORE运行顺序：
+            先运行selectKey查询id的sql；查出id值封装给javaBean的id属性
+            在运行插入的sql；就可以取出id属性对应的值
+        AFTER运行顺序：
+            先运行插入的sql（从序列中取出新值作为id）；
+            再运行selectKey查询id的sql；
+         &ndash;&gt;
+        <selectKey keyProperty="id" order="BEFORE" resultType="Integer">
+            &lt;!&ndash; 编写查询主键的sql语句 &ndash;&gt;
+            &lt;!&ndash; BEFORE&ndash;&gt;
+            select EMPLOYEES_SEQ.nextval from dual
+            &lt;!&ndash; AFTER：
+             select EMPLOYEES_SEQ.currval from dual &ndash;&gt;
+        </selectKey>
+
+        &lt;!&ndash; 插入时的主键是从序列中拿到的 &ndash;&gt;
+        &lt;!&ndash; BEFORE:&ndash;&gt;
+        insert into employees(EMPLOYEE_ID,LAST_NAME,EMAIL)
+        values(#{id},#{lastName},#{email&lt;!&ndash; ,jdbcType=NULL &ndash;&gt;})
+        &lt;!&ndash; AFTER：
+        insert into employees(EMPLOYEE_ID,LAST_NAME,EMAIL)
+        values(employees_seq.nextval,#{lastName},#{email}) &ndash;&gt;
+    </insert>-->
+
+</mapper>

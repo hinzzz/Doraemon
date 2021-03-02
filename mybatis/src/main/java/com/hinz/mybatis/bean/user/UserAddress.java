@@ -50,7 +50,7 @@ public class UserAddress implements Serializable {
     /**
      * 详细地址（具体街道门牌）
      */
-    private String detailedAddress;
+    private String detailAddress;
 
     /**
      * 创建时间
