@@ -7,6 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +35,7 @@ public class ValidExceptionControllerAdvice {
 
     @ExceptionHandler(value= {ConstraintViolationException.class})
     public R handleVaildException(ConstraintViolationException e){
+
       /*  BindingResult bindingResult = e.getBindingResult();
         log.error("校验参数：{}",bindingResult.getTarget().toString());
         log.error("数据校验出现问题{}，异常类型：{}",e.getMessage(),e.getClass());*/

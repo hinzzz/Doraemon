@@ -1,34 +1,87 @@
+### 默认校验  ,BindingResult bindingResult
+POST http://127.0.0.1:8080/valid/addWithOutGroup
+Content-Type: application/json
+
+{
+  "id": 1,
+  "userName": "123123",
+  "age": null,
+  "mobileNo": null,
+  "gender": 3,
+  "homeUrl": "12312312"
+}
+
+### 新增分组校验
 POST http://127.0.0.1:8080/valid/add
 Content-Type: application/json
 
-{ "id":null, "userName":null, "age":null, "mobileNo":null, "gender":3, "homeUrl":"12312312" }
+{
+  "id": 1,
+  "userName": null,
+  "age": null,
+  "mobileNo": null,
+  "gender": 2,
+  "homeUrl": "12312312"
+}
 
-###
 
+###  修改分组校验
 POST http://127.0.0.1:8080/valid/update
 Content-Type: application/json
 
-{ "id":1, "userName":null, "age":0, "mobileNo":null, "gender":3, "homeUrl":"12312312" }
+{
+  "id": null,
+  "userName": null,
+  "age": 0,
+  "mobileNo": null,
+  "gender":2,
+  "homeUrl": "12312312"
+}
 
-###
-
-POST http://127.0.0.1:8080/valid/test
+### 自定义校验器
+POST http://127.0.0.1:8080/valid/update
 Content-Type: application/json
 
-{ "id":null, "userName":null, "age":null, "mobileNo":"15989197190", "gender":3, "homeUrl":"12312312" ,"addressInfos": [{ "id":123123, "description": "123" }],"flag":false}
+{
+  "id": 1,
+  "userName": "quanhz",
+  "age": 1,
+  "mobileNo": null,
+  "gender":3,
+  "homeUrl": "12312312"
+}
+
+
+###  嵌套参数校验
+POST http://127.0.0.1:8080/valid/nest
+Content-Type: application/json
+
+{
+  "id": null,
+  "userName": null,
+  "age": null,
+  "mobileNo": "15989197190",
+  "gender": 3,
+  "homeUrl": "12312312",
+  "addressInfos": [
+    {
+      "id": 123123,
+      "email": "123123",
+      "description": "123"
+    }
+  ],
+  "flag": false
+}
+
+### 单个参数校验
+GET http://127.0.0.1:8080/valid/testSingleParam?name=
 
 ###
-
 
 POST http://127.0.0.1:8080/valid/testAddr
 Content-Type: application/json
 
-{ "id":123123, "description": "123" }
-
-###
-
-GET http://127.0.0.1:8080/valid/testSingleParam?name=
-
-
-###
-
+{
+  "id": 123123,
+  "description": "123"
+}

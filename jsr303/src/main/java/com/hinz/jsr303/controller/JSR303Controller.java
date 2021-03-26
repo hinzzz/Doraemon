@@ -9,6 +9,7 @@ import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author ：quanhz
@@ -32,6 +35,13 @@ public class JSR303Controller {
     @Resource
     private MethodValidationPostProcessor methodValidationPostProcessor;
 
+
+    @RequestMapping("addWithOutGroup")
+    public R addWithOutGroup( @Validated @RequestBody UserInfo userInfo ){
+        log.info(userInfo.toString());
+        return R.ok();
+    }
+
     @RequestMapping("add")
     public R add( @Validated({AddGroup.class}) @RequestBody UserInfo userInfo){
         log.info(userInfo.toString());
@@ -44,8 +54,8 @@ public class JSR303Controller {
         return R.ok();
     }
 
-    @RequestMapping("test")
-    public R test(@RequestBody @Validated UserInfo userInfo){
+    @RequestMapping("nest")
+    public R nest(@RequestBody @Validated UserInfo userInfo){
         log.info(userInfo.toString());
         return R.ok();
     }
@@ -58,7 +68,7 @@ public class JSR303Controller {
     }
 
     @RequestMapping("testSingleParam")
-    public R testSingleParam(@Length(min = 1) String name){
+    public R testSingleParam(@Validated @NotBlank(message = "name不能为空") String name, @Validated  @NotNull(message = "id不能为空") String id){
         log.info("name : "+name);
         return R.ok();
     }

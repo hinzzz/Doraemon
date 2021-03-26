@@ -22,7 +22,7 @@ public class UserInfo {
     @Null(message = "新增不能指定id",groups = {AddGroup.class})
     private Long id;
 
-    @NotNull(message = "用户名不能为空",groups = {UpdateGroup.class})
+    @Null(message = "用户名不能为空")
     private String userName;
 
     @NotNull(message = "年龄不能为空",groups = {AddGroup.class})
@@ -33,7 +33,7 @@ public class UserInfo {
     @Pattern(regexp = "^(1)\\d{10}$",message = "手机号格式错误")
     private String mobileNo;
 
-    @IntValue(accessVals = {1,2},groups = {AddGroup.class})
+    @IntValue(accessVals = {1,2},groups = {UpdateGroup.class})
     private Integer gender;
 
     @NotBlank(groups = {AddGroup.class})
