@@ -68,7 +68,7 @@ public class JSR303Controller {
     }
 
     @RequestMapping("testSingleParam")
-    public R testSingleParam(@Validated @NotBlank(message = "name不能为空") String name, @Validated  @NotNull(message = "id不能为空") String id){
+    public R testSingleParam(@Validated @NotBlank(message = "name不能为空") String name, @Validated  @NotBlank(message = "id不能为空") String id){
         log.info("name : "+name);
         return R.ok();
     }

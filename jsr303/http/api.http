@@ -74,7 +74,7 @@ Content-Type: application/json
 }
 
 ### 单个参数校验
-GET http://127.0.0.1:8080/valid/testSingleParam?name=
+GET http://127.0.0.1:8080/valid/testSingleParam?name=?id=
 
 ###
 
