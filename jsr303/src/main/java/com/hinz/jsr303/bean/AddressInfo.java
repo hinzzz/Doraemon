@@ -15,5 +15,7 @@ public class AddressInfo {
     private Long id;
 
     @Email
-    private String description;
+    private String email;
+
+    private String detail;
 }
