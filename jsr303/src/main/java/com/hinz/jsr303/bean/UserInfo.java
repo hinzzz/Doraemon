@@ -29,7 +29,7 @@ public class UserInfo {
     @Min(value = 1,message = "年龄必须大于1",groups = {AddGroup.class,UpdateGroup.class})
     private Integer age;
 
-    @NotNull(message = "手机号不能为空")
+    @NotEmpty(message = "手机号不能为空",groups = {UpdateGroup.class})
     @Pattern(regexp = "^(1)\\d{10}$",message = "手机号格式错误")
     private String mobileNo;
 
@@ -43,8 +43,7 @@ public class UserInfo {
      * 校验嵌套级联属性必须在属性上加@Valid
      */
     @Valid
-    @NotNull
-    @Size(min=1)
+    @NotEmpty(message = "地址列表不能为空",groups = {UpdateGroup.class})
     private List<AddressInfo> addressInfos;
 
     @AssertTrue

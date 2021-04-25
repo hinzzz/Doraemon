@@ -25,8 +25,8 @@ public class DoubleColonDemo {
         System.out.println("f1 = " + f1.apply(1));
 
         //使用双冒号
-        Function<Integer, Employee> f2 = Employee::new;
-        System.out.println("f2 = " + f2.apply(2));
+        Function<String, Employee> f2 = Employee::new;
+        System.out.println("f2 = " + f2.apply("aaa"));
 
 
         Function<Integer,Integer[]> f3 = n -> new Integer[n];

@@ -1,5 +1,5 @@
 ### 默认校验  ,BindingResult bindingResult
-POST http://127.0.0.1:8080/valid/addWithOutGroup
+POST http://127.0.0.1:3001/valid/addWithOutGroup
 Content-Type: application/json
 
 {
@@ -12,7 +12,7 @@ Content-Type: application/json
 }
 
 ### 新增分组校验
-POST http://127.0.0.1:8080/valid/add
+POST http://127.0.0.1:3001/valid/add
 Content-Type: application/json
 
 {
@@ -26,20 +26,21 @@ Content-Type: application/json
 
 
 ###  修改分组校验
-POST http://127.0.0.1:8080/valid/update
+POST http://127.0.0.1:3001/valid/update
 Content-Type: application/json
 
 {
   "id": null,
   "userName": null,
   "age": 0,
-  "mobileNo": null,
+  "mobileNo": "",
   "gender":2,
-  "homeUrl": "12312312"
+  "homeUrl": "12312312",
+  "addressInfos": [{}]
 }
 
 ### 自定义校验器
-POST http://127.0.0.1:8080/valid/update
+POST http://127.0.0.1:3001/valid/update
 Content-Type: application/json
 
 {
@@ -53,7 +54,7 @@ Content-Type: application/json
 
 
 ###  嵌套参数校验
-POST http://127.0.0.1:8080/valid/nest
+POST http://127.0.0.1:3001/valid/nest
 Content-Type: application/json
 
 {
@@ -74,11 +75,11 @@ Content-Type: application/json
 }
 
 ### 单个参数校验
-GET http://127.0.0.1:8080/valid/testSingleParam?name=?id=
+GET http://127.0.0.1:3001/valid/testSingleParam?name=?id=
 
 ###
 
-POST http://127.0.0.1:8080/valid/testAddr
+POST http://127.0.0.1:3001/valid/testAddr
 Content-Type: application/json
 
 {

@@ -21,6 +21,14 @@ import org.junit.Test;
  */
 public class TestOptional {
 
+
+	@Test
+	public void test7(){
+		String a = null;
+		Optional<String> s = Optional.ofNullable(a).map((type) -> type.equals("1") ? "AA" : "BB");
+		System.out.println( s.isPresent());
+	}
+
 	@Test
 	public void test4(){
 		Optional<Employee> op = Optional.of(new Employee(101, "张三", 18, 9999.99,null));
