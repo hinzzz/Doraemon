@@ -41,7 +41,7 @@ public class UserInfo {
      * 校验嵌套级联属性必须在属性上加@Valid
      */
     @Valid
-    @NotEmpty(message = "地址列表不能为空",groups = {ValidatorGroup.Update.class})
+    @NotNull(message = "地址列表不能为空",groups = {ValidatorGroup.Update.class})
     private List<AddressInfo> addressInfos;
 
     @AssertTrue

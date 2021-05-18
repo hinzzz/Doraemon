@@ -22,7 +22,6 @@ import javax.validation.constraints.NotBlank;
 @RestController
 @RequestMapping("/valid")
 @Slf4j
-@Validated
 public class JSR303Controller {
 
     @Resource

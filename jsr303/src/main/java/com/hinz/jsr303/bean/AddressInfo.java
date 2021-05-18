@@ -14,7 +14,7 @@ public class AddressInfo {
 
     private Long id;
 
-    @Email
+    @Email(message = "嵌套参数：email不合法")
     private String email;
 
     private String detail;
