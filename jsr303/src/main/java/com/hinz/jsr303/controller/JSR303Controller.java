@@ -3,13 +3,8 @@ package com.hinz.jsr303.controller;
 import com.hinz.jsr303.bean.AddressInfo;
 import com.hinz.jsr303.common.R;
 import com.hinz.jsr303.bean.UserInfo;
-import com.hinz.jsr303.valid.AddGroup;
-import com.hinz.jsr303.valid.UpdateGroup;
-import lombok.extern.java.Log;
+import com.hinz.jsr303.valid.ValidatorGroup;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.validator.constraints.Length;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,9 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 /**
  * @author ：quanhz
@@ -43,13 +36,13 @@ public class JSR303Controller {
     }
 
     @RequestMapping("add")
-    public R add( @Validated({AddGroup.class}) @RequestBody UserInfo userInfo){
+    public R add( @Validated({ValidatorGroup.Insert.class}) @RequestBody UserInfo userInfo){
         log.info(userInfo.toString());
         return R.ok();
     }
 
     @RequestMapping("update")
-    public R update(@RequestBody @Validated({UpdateGroup.class}) UserInfo userInfo){
+    public R update(@RequestBody @Validated({ValidatorGroup.Update.class}) UserInfo userInfo){
         log.info(userInfo.toString());
         return R.ok();
     }
