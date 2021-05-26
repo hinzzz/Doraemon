@@ -12,6 +12,7 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -36,9 +37,15 @@ class MybatisApplicationTests {
 	void contextLoads() {
 	}
 
+	@Test
+	void select(){
+		UserInfo userInfo = userInfoService.getById(1);
+		System.out.println("userInfo = " + userInfo);
+	}
 
 	@Test
 	void plusTest(){
+		userInfoService.save(UserInfo.builder().account("bb").build());
 		userInfoService.save(UserInfo.builder().account("aa").build());
 	}
 

@@ -20,20 +20,28 @@ class Jsr3ApplicationTests {
 
 
     public static void main(String[] args) {
-        ArrayList<AddressInfo> list = new ArrayList<>();
-        AddressInfoDetail aaaaaaaaaaaa = AddressInfoDetail.builder().a("aaaaaaaaaaaa").build();
-        list.add(aaaaaaaaaaaa);
-        UserInfo hinz = UserInfo.builder().userName("hinz").addressInfos(list).build();
-        System.out.println("hinz = " + hinz);
+        List<AddressInfo> addressInfos = new ArrayList<>();
+        UserInfo userInfo = UserInfo.builder().userName("hinzzz").build();
+        AddressInfo aid =new AddressInfo();
+        aid.setDetail("良垌");
+        addressInfos.add(aid);
+        userInfo.setAddressInfos(addressInfos);
 
-        List<AddressInfo> bbbb = list.stream().map(item -> {
+        System.out.println("userInfo = " + userInfo);
+        List<AddressInfo> list = userInfo.getAddressInfos();
+
+       /* list.stream().map(item -> {
             AddressInfoDetail ccc = AddressInfoDetail.builder().a("ccc").build();
             return ccc;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList());*/
 
-        bbbb.forEach(item->{
-            System.out.println("item = " + item.getDetail());
-        });
+        for (AddressInfo item : list) {
+            item.setDetail("深圳");
+        }
+
+        System.out.println("userInfo = " + userInfo);
 
     }
 }
+
+

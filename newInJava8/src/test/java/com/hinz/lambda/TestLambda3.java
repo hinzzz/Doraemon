@@ -41,7 +41,9 @@ public class TestLambda3 {
 
 
 		//使用streamApi优化
-		list.stream().filter((s) -> s.length() >= 2).collect(Collectors.toList()).forEach(System.out::println);
+		list.stream().filter(
+				s -> s.length() >= 2
+		).collect(Collectors.toList()).forEach(System.out::println);
 	}
 
 	//需求：将满足条件的字符串，放入集合中

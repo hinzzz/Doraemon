@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.*;
 
 /**
@@ -63,6 +64,7 @@ public class UserInfo implements Serializable {
      */
     private LocalDateTime lastUpdateTime;
 
+    @TableField(exist = false)
     private List<UserAddress> userAddressList;
 
     private static final long serialVersionUID = 1L;
