@@ -2,6 +2,7 @@ package com.hinz.jsr303.bean;
 
 import com.hinz.jsr303.valid.IntValue;
 import com.hinz.jsr303.valid.ValidatorGroup;
+import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.Valid;
@@ -14,6 +15,7 @@ import java.util.List;
  * @Description : No Description
  */
 @Data
+@Builder
 public class UserInfo {
 
     @NotNull(message = "修改必须指定id",groups = {ValidatorGroup.Update.class})
