@@ -17,9 +17,6 @@ public class Employee {
 	private double salary;
 	private Status status;
 
-	public Employee(Integer integer) {
-	}
-
 	public Employee(String s, Integer integer) {
 	}
 

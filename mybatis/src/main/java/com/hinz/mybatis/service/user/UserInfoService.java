@@ -2,6 +2,7 @@ package com.hinz.mybatis.service.user;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hinz.mybatis.bean.user.UserInfo;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -10,6 +11,7 @@ import java.util.List;
  * @date ：Created in 2021/2/5 11:27
  * @Description : No Description
  */
+@Transactional
 public interface UserInfoService extends IService<UserInfo> {
 
     /**

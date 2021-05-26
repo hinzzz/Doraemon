@@ -6,7 +6,7 @@
     <artifactId>problems</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>problems</name>
-    <description>Demo project for Spring Boot</description>
+    <description>用于记录开发中的疑难杂症</description>
 
     <properties>
         <java.version>1.8</java.version>
@@ -18,9 +18,20 @@
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

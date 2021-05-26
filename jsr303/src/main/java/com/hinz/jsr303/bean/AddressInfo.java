@@ -1,5 +1,6 @@
 package com.hinz.jsr303.bean;
 
+import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.Email;
@@ -14,7 +15,7 @@ public class AddressInfo {
 
     private Long id;
 
-    @Email
+    @Email(message = "嵌套参数：email不合法")
     private String email;
 
     private String detail;
