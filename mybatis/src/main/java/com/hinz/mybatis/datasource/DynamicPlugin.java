@@ -59,7 +59,7 @@ public class DynamicPlugin implements Interceptor {
 
             if ((dynamicDataSourceGlobal = CACHE_MAP.get(ms.getId())) == null) {
                 dynamicDataSourceGlobal = getDynamicDataSource(ms, objects[1]);
-                log.debug("method[{}] use [{}] Strategy, SqlCommandType [{}]..", ms.getId(), dynamicDataSourceGlobal.name(), ms.getSqlCommandType().name());
+                log.debug("设置方法[{}] use [{}] Strategy, SqlCommandType [{}]..", ms.getId(), dynamicDataSourceGlobal.name(), ms.getSqlCommandType().name());
                 CACHE_MAP.put(ms.getId(), dynamicDataSourceGlobal);
             }
             DynamicDataSourceHolder.putDataSource(dynamicDataSourceGlobal);
