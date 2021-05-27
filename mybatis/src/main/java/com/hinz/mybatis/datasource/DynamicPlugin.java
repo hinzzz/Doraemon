@@ -1,6 +1,7 @@
 package com.hinz.mybatis.datasource;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.executor.keygen.SelectKeyGenerator;
 import org.apache.ibatis.mapping.BoundSql;
@@ -29,8 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
     @Signature(type = Executor.class, method = "update", args = {
         MappedStatement.class, Object.class}),
     @Signature(type = Executor.class, method = "query", args = {
-        MappedStatement.class, Object.class, RowBounds.class,
-        ResultHandler.class})})
+            MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class, CacheKey.class, BoundSql.class})})
 @Slf4j
 public class DynamicPlugin implements Interceptor {
 

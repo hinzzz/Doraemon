@@ -1,9 +1,11 @@
 package com.hinz.mybatis.service.user.impl;
 
+import com.alibaba.druid.pool.DruidDataSource;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hinz.mybatis.bean.user.UserInfo;
 import com.hinz.mybatis.mapper.user.UserInfoMapper;
 import com.hinz.mybatis.service.user.UserInfoService;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -22,6 +24,8 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
     @Resource
     private UserInfoMapper userInfoMapper;
 
+
+
     @Override
     public UserInfo getUserInfoAddress(Long userId) {
         return userInfoMapper.getUserInfoAddress(userId);
@@ -29,6 +33,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
 
     @Override
     public List<UserInfo> getUserInfoAddress2(String paramAccount) {
+        UserInfo userInfo = userInfoMapper.selectById(1);
         return userInfoMapper.getUserInfoAddress2(paramAccount);
     }
 

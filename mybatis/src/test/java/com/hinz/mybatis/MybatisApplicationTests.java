@@ -39,7 +39,7 @@ class MybatisApplicationTests {
 
 	@Test
 	void select(){
-		List<UserInfo> a = userInfoService.getUserInfoAddress2("a");
+		List<UserInfo> a = userInfoService.getUserInfoAddress2("222");
 	}
 
 	@Test
