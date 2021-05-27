@@ -29,7 +29,6 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
 
     @Override
     public List<UserInfo> getUserInfoAddress2(String paramAccount) {
-        System.out.println("TransactionAspectSupport.currentTransactionStatus() = " + TransactionAspectSupport.currentTransactionStatus());
         return userInfoMapper.getUserInfoAddress2(paramAccount);
     }
 

@@ -29,7 +29,7 @@ import javax.sql.DataSource;
 
 @Configuration
 @MapperScan("com.hinz.mybatis.mapper.*")
-@EnableTransactionManagement
+//@EnableTransactionManagement(proxyTargetClass = true)
 public class DataSourceConfig {
     /**
      * Write data source druid data source.

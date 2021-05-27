@@ -1,10 +1,10 @@
-package cn.com.bluemoon.mybatis.Exception;
+package com.hinz.mybatis.exception;
 
 /**
  * 抽象接口
  *
- * @author fengshuonan
- * @date 2017-12-28-下午10:27
+ * @author hinzzz
+ * @Date 2021/05/27 下午10:33
  */
 public interface ServiceExceptionEnum {
     
