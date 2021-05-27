@@ -11,7 +11,6 @@ import java.util.List;
  * @date ：Created in 2021/2/5 11:27
  * @Description : No Description
  */
-@Transactional
 public interface UserInfoService extends IService<UserInfo> {
 
     /**
@@ -27,5 +26,7 @@ public interface UserInfoService extends IService<UserInfo> {
      * @return
      */
     List<UserInfo> getUserInfoAddress2(String paramAccount);
+
+    void testTransaction();
 
 }

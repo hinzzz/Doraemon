@@ -13,8 +13,6 @@ import org.apache.ibatis.plugin.Plugin;
 import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.Locale;
@@ -59,7 +57,7 @@ public class DynamicPlugin implements Interceptor {
 
             if ((dynamicDataSourceGlobal = CACHE_MAP.get(ms.getId())) == null) {
                 dynamicDataSourceGlobal = getDynamicDataSource(ms, objects[1]);
-                log.debug("method[{}] use [{}] Strategy, SqlCommandType [{}]..", ms.getId(), dynamicDataSourceGlobal.name(), ms.getSqlCommandType().name());
+                log.debug("设置方法[{}] use [{}] Strategy, SqlCommandType [{}]..", ms.getId(), dynamicDataSourceGlobal.name(), ms.getSqlCommandType().name());
                 CACHE_MAP.put(ms.getId(), dynamicDataSourceGlobal);
             }
             DynamicDataSourceHolder.putDataSource(dynamicDataSourceGlobal);

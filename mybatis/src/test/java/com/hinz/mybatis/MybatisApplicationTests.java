@@ -39,14 +39,12 @@ class MybatisApplicationTests {
 
 	@Test
 	void select(){
-		UserInfo userInfo = userInfoService.getById(1);
-		System.out.println("userInfo = " + userInfo);
+		List<UserInfo> a = userInfoService.getUserInfoAddress2("a");
 	}
 
 	@Test
 	void plusTest(){
-		userInfoService.save(UserInfo.builder().account("bb").build());
-		userInfoService.save(UserInfo.builder().account("aa").build());
+		userInfoService.testTransaction();
 	}
 
 	/**
