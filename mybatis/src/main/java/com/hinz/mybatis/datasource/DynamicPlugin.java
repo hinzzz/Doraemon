@@ -23,12 +23,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 动态数据源Mybatis拦截器插件
+ * query拦截方法有两个 一个是四个参数一个是六个参数 因为拦截器链条，和拦截器顺序的原因，在这行到当前 DynamicPlugin拦截器的时候可能调用了六个参数的方法，
+ * 避免放生问题 四个参数和六个参数都做了拦截 保证走到当前拦截器
  *
  * @author hinzzz
  */
 @Intercepts({
     @Signature(type = Executor.class, method = "update", args = {
         MappedStatement.class, Object.class}),
+    @Signature(type = Executor.class, method = "query", args = {
+            MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}),
     @Signature(type = Executor.class, method = "query", args = {
             MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class, CacheKey.class, BoundSql.class})})
 @Slf4j
