@@ -13,7 +13,7 @@ import java.util.Scanner;
 public class MainUtils {
     private static Map<String,String> utils = new HashMap();
     static {
-        utils.put("1","阿里云图片上传");
+        //utils.put("1","阿里云图片上传");
         utils.put("2","文件解密");
     }
     public static void main(String[] args) {
@@ -27,27 +27,19 @@ public class MainUtils {
 
     }
     public static void run(){
-        System.out.println("===========请选择工具 输入序号既可 输入q退出 ===========");
-        System.out.println(utils);
+        //System.out.println("===========请选择工具 输入序号既可 输入q退出 ===========");
+        //System.out.println(utils);
         Scanner in = new Scanner(System.in);
         while (true){
-            System.out.print("请输入序号：");
+            //System.out.print("请输入序号：");
             String num=in.next();
+
             if (Arrays.asList("quit", "q", "bye", "exit").contains(num.toLowerCase())) {
                 MainUtils.byebye();
                 in.close();
                 return;
             }
-            if(utils.get(num)==null)continue;
-            System.out.println("当前工具："+utils.get(num));
-            switch (num){
-                case "1":
-                    ALiUtil.toUpload();
-                    return;
-                case "2":
-                    DecUtil.dec();
-                    return;
-            }
+            DecUtil.dec();
         }
     }
 

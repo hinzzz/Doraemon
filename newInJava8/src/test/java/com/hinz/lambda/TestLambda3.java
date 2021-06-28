@@ -1,14 +1,13 @@
 package com.hinz.lambda;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import com.hinz.bean.QueryCornerResDto;
 import org.junit.Test;
 
 /*
@@ -28,6 +27,39 @@ import org.junit.Test;
  *
  */
 public class TestLambda3 {
+
+
+	@Test
+	public void test5(){
+		List<QueryCornerResDto> omsList = new ArrayList<QueryCornerResDto>();
+		Map<Integer,QueryCornerResDto> map1 = new HashMap<>();
+		QueryCornerResDto dto1 = new QueryCornerResDto(1, 2, "收衣管理-待接单");
+		QueryCornerResDto dto2 = new QueryCornerResDto(2, 12, "收衣管理-待收取");
+
+		map1.put(1,dto1);
+		map1.put(2,dto2);
+		List<QueryCornerResDto> washList = new ArrayList<QueryCornerResDto>();
+		QueryCornerResDto dto3 = new QueryCornerResDto(1, 2, "收衣管理-待接单");
+		QueryCornerResDto dto4 = new QueryCornerResDto(2, 5, "收衣管理-待收取");
+		QueryCornerResDto dto5 = new QueryCornerResDto(5, 5, "收衣管理-待收取");
+
+		washList.add(dto3);
+		washList.add(dto4);
+		washList.add(dto5);
+
+		washList.forEach(wash->{
+			if(!map1.containsKey(wash.getType())){
+				map1.put(wash.getType(),wash);
+			}else{
+				wash.setTypeCount(wash.getTypeCount()+map1.get(wash.getType()).getTypeCount());
+				map1.put(wash.getType(),wash);
+			}
+		});
+
+		System.out.println("map1 = " + map1);
+
+
+	}
 
 	//Predicate<T> 断言型接口：
 	@Test

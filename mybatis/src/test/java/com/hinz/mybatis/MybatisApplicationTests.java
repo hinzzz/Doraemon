@@ -24,7 +24,7 @@ import java.util.Date;
 import java.util.List;
 
 @Slf4j
-@SpringBootTest
+//@SpringBootTest
 class MybatisApplicationTests {
 
 	@Resource
@@ -36,6 +36,15 @@ class MybatisApplicationTests {
 	@Test
 	void contextLoads() {
 	}
+
+
+	@Test
+	void fun6(){
+		for (int i = 1; i <= 10; i++) {
+			System.out.println( "A" + i +"      "+"B" + (i+10));
+		}
+	}
+
 
 	@Test
 	void select(){
