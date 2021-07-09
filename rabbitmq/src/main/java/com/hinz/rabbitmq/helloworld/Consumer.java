@@ -8,6 +8,7 @@ public class Consumer {
     private final static String QUEUE_NAME="hello";
 
     public static void main(String[] args) {
+
         //创建连接工厂
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("www.xieguangda.top");

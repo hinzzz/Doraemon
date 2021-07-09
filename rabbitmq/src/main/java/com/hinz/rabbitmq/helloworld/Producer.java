@@ -4,8 +4,6 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
-import java.io.IOException;
-import java.util.concurrent.TimeoutException;
 
 public class Producer {
     private final static String QUEUE_NAME="hello";
@@ -37,7 +35,7 @@ public class Producer {
              * 3、其他参数
              * 4、消息内容
              */
-            String msg = "第1条消息";
+            String msg = "第3条消息";
             channel.basicPublish("",QUEUE_NAME,null,msg.getBytes());
             System.out.println("发送完毕");
         } catch (Exception e) {
