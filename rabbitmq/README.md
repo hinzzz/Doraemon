@@ -246,9 +246,194 @@ RabbitMQ 将停止在通道上传递更多消息，除非至少有一个未处�
 
 ##### 1、发布确认原理
 
-> ​	生产者将信道设置成confirm模式，一旦信道进入confirm模式，所有在该信道发布的消息将会被指派一个唯一ID（从1开始）,一旦消息被投递到所匹配的消息之后，broker就会发送一个确认消息给生产者（包括消息的唯一ID）,这就使得生产者已经知道消息成功投递到目的队列了。如果消息是持久化的，那么确认消息会在将消息写入磁盘之后发送给生产者，此外也可以设置basic.ack的mutiple，表示到这个序号之前的的所有消息都已经应答									     	confirm模式最大的好处是，它是异步的，一旦发布一条消息，生产者应用程序就可以在等待返回确认的时候继续发送下一条消息，当消息最终确认之后，生产应用就可以通过回调来处理该确认消息。如果RabbitMQ因为内部原因导致消息丢失，就会发送一条nack消息，生产者同样可以在回调中处理该消息。
+> ​	生产者将信道设置成confirm模式，一旦信道进入confirm模式，所有在该信道发布的消息将会被指派一个唯一ID（从1开始）,一旦消息被投递到所匹配的消息之后，broker就会发送一个确认消息给生产者（包括消息的唯一ID）,这就使得生产者已经知道消息成功投递到目的队列了。如果消息是持久化的，那么确认消息会在将消息写入磁盘之后发送给生产者，此外也可以设置basic.ack的mutiple，表示到这个序号之前的的所有消息都已经应答。confirm模式最大的好处是，它是异步的，一旦发布一条消息，生产者应用程序就可以在等待返回确认的时候继续发送下一条消息，当消息最终确认之后，生产应用就可以通过回调来处理该确认消息。如果RabbitMQ因为内部原因导致消息丢失，就会发送一条nack消息，生产者同样可以在回调中处理该消息。
 
 ##### 2、发布确认策略
 
-###### 开启发布确认的方法
+##### 3、开启发布确认的方法
 
+```java
+channel.confirmSelect();//开启确认
+boolean confirm = channel.waitForConfirms();//等待确认
+if(confirm){
+    System.out.println("消息发送成功");
+}
+```
+
+##### 4、单个确认
+
+> ​	一种同步确认发布方式，也就是生产者发布一条消息之后，必须等待这条消息确认之后才能发布下一条消息，boolean waitForConfirms(long timeout)这个方法只有在消息被确认的时候才能返回，如果指定时间内没返回，抛出异常
+>
+> 缺点：发布速度特别慢，这种方式最多提供每秒百条数据的吞吐量
+
+
+
+```java
+package com.hinz.rabbitmq.msgConfirm;
+
+import com.hinz.rabbitmq.utils.RabbitMQUtils;
+import com.rabbitmq.client.Channel;
+
+public class SingleConfirm {
+    public static void main(String[] args) {
+        Channel channel = RabbitMQUtils.getChannel();
+        try {
+            channel.confirmSelect();
+            channel.queueDeclare("single-confirm",false,false,false,null);
+            channel.confirmSelect();
+            long begin = System.currentTimeMillis();
+            for (int i = 0; i < 1000; i++) {
+                String msg = i+"";
+                channel.basicPublish("","single-confirm",null,msg.getBytes());
+                boolean confirm = channel.waitForConfirms();
+                if(confirm){
+                    System.out.println("消息发送成功");
+                }
+            }
+            long end = System.currentTimeMillis();
+            System.out.println("共发送1000条消息，共耗时" + (end - begin));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+```
+
+运行结果：单个共发送1000条消息，共耗时15395
+
+
+
+##### 5、批量发布确认
+
+> 上面单个确认的方式处理消息太慢，与单个消息确认相比，先发布一批消息，最后一起确认，可以极大的提高吞吐量。
+>
+> 缺点：当发生故障导致发布问题时，不知道是哪个信息出现问题，必须将整批消息保存到内存中，以记录消息。这种方案仍然是同步的，也一样阻塞消息的发布。
+
+
+
+```java
+package com.hinz.rabbitmq.msgConfirm;
+
+import com.hinz.rabbitmq.utils.RabbitMQUtils;
+import com.rabbitmq.client.Channel;
+
+public class BatchConfirm {
+    public static void main(String[] args) {
+        Channel channel = RabbitMQUtils.getChannel();
+        try {
+            channel.queueDeclare("batch-confirm", false, false, false, null);
+            channel.confirmSelect();
+            int confirmCount = 200;
+            int msgCount = 0;
+            long begin = System.currentTimeMillis();
+            for (int i = 0; i < 1000; i++) {
+                String msg = i + "";
+                channel.basicPublish("", "batch-confirm", null, msg.getBytes());
+                msgCount++;
+                if (msgCount == confirmCount) {
+                    channel.waitForConfirms();
+                    msgCount = 0;
+                }
+            }
+            if(msgCount>0){
+                channel.waitForConfirms();
+            }
+
+            long end = System.currentTimeMillis();
+
+            System.out.println("批量共发送1000条消息，共耗时" + (end - begin));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+```
+
+运行结果：批量共发送1000条消息，共耗时139
+
+##### 6、异步确认
+
+> 编程逻辑比较复杂，但性价比高，通过回调函数达到消息可靠性
+
+```java
+package com.hinz.rabbitmq.msgConfirm;
+
+import com.hinz.rabbitmq.utils.RabbitMQUtils;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.ConfirmCallback;
+import java.util.concurrent.ConcurrentNavigableMap;
+import java.util.concurrent.ConcurrentSkipListMap;
+
+public class AsyncConfirm {
+    public static void main(String[] args) {
+        Channel channel = RabbitMQUtils.getChannel();
+        try {
+            channel.queueDeclare("async-confirm",false,false,false,null);
+            channel.confirmSelect();
+
+            /**
+             * 线程安全有序的一个哈希表，适用于高并发的情况下
+             * 1、轻松的将序号与消息关联
+             * 2、轻松批量删除信息，只要传序号
+             * 3、支持并发访问
+             */
+            ConcurrentSkipListMap<Long,String> waitConfirmMap = new ConcurrentSkipListMap<>();
+
+            /**
+             * 确认消息的一个回调
+             * 1、消息序列号
+             * 2、true：可以确认小于等于当前序列号的消息
+             *    false：只能确认当前消息
+             */
+
+            ConfirmCallback confirmCallback = (deliveryTag,  multiple) ->{
+                if(multiple){
+                    //返回的是小于或等于当前序号未确认的消息 是一个map
+                    ConcurrentNavigableMap<Long, String> confirmed = waitConfirmMap.headMap(deliveryTag, true);
+                    //清楚部分未确认消息
+                    confirmed.clear();
+                }else {
+                    //只删除当前序号的消息
+                    waitConfirmMap.remove(deliveryTag);
+                }
+            };
+
+            ConfirmCallback nackCallback = (deliveryTag,  multiple) ->{
+                String msg = waitConfirmMap.get(deliveryTag);
+                System.out.println("消息：" + msg + " 未被确认");
+            };
+            /**
+             * 添加一个异步的确认监听器
+             * 1、确认消息的回调
+             * 2、未收到消息的回调
+             */
+            channel.addConfirmListener(confirmCallback,nackCallback);
+            long begin = System.currentTimeMillis();
+            for (int i = 0; i < 1000; i++) {
+                String msg = i+"";
+                /**
+                 * channel.getNextPublishSeqNo() 获取下一个消息的序列号
+                 * 通过序列号与消息体进行关联
+                 * 全部都是未确认的消息
+                 */
+                waitConfirmMap.put(channel.getNextPublishSeqNo(),msg);
+                channel.basicPublish("","async-confirm",null,msg.getBytes());
+            }
+            long end = System.currentTimeMillis();
+            System.out.println("异步发布1000条消息，共消耗" + (end - begin));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+}
+
+```
+
+
+
+运行结果：异步发布1000条消息，共消耗57
+
+![](http://hinzzz.oss-cn-shenzhen.aliyuncs.com/asyncConfirm.png?Expires=32500886400&OSSAccessKeyId=LTAI4G9rkBZLb3G51wiGr2sS&Signature=2nYq6k%2Bc2hTI7LLOy4jfayLyJKc%3D)
