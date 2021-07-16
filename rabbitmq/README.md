@@ -1053,9 +1053,114 @@ public class Consumer01 {
         });
     }
 }
-
 ```
 
 多余的4个消息被转入到dead-queue
 
 ![](http://hinzzz.oss-cn-shenzhen.aliyuncs.com/dead-maxlength.png?Expires=32500886400&OSSAccessKeyId=LTAI4G9rkBZLb3G51wiGr2sS&Signature=9nrr0jF13txuSvAXNASboN1voYE%3D)
+
+
+
+
+
+##### 4、消息被拒
+
+
+
+```java
+package com.hinz.rabbitmq.deadqueue.reject;
+
+import com.hinz.rabbitmq.utils.RabbitMQUtils;
+import com.rabbitmq.client.BuiltinExchangeType;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.DeliverCallback;
+
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Consumer01 {
+    //普通交换机名称
+    private static final String NORMAL_EXCHANGE = "normal_exchange";
+    //死信交换机名称
+    private static final String DEAD_EXCHANGE = "dead_exchange";
+
+    public static void main(String[] argv) throws Exception {
+        Channel channel = RabbitMQUtils.getChannel();
+        //声明死信和普通交换机 类型为 direct
+        channel.exchangeDeclare(NORMAL_EXCHANGE, BuiltinExchangeType.DIRECT);
+        channel.exchangeDeclare(DEAD_EXCHANGE, BuiltinExchangeType.DIRECT);
+        //声明死信队列
+        String deadQueue = "dead-queue";
+        channel.queueDeclare(deadQueue, false, false, false, null);
+        //死信队列绑定死信交换机与 routingkey
+        channel.queueBind(deadQueue, DEAD_EXCHANGE, "lisi");//正常队列绑定死信队列信息
+        Map<String, Object> params = new HashMap<>();
+        //正常队列设置死信交换机 参数 key 是固定值
+        params.put("x-dead-letter-exchange", DEAD_EXCHANGE);
+        //正常队列设置死信 routing-key 参数 key 是固定值
+        params.put("x-dead-letter-routing-key", "lisi");
+        String normalQueue = "normal-queue";
+        channel.queueDeclare(normalQueue, false, false, false, params);
+        channel.queueBind(normalQueue, NORMAL_EXCHANGE, "zhangsan");
+        System.out.println("等待接收消息.....");
+        DeliverCallback deliverCallback = (consumerTag, delivery) -> {
+            String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
+            if (message.equals("info5")) {
+                System.out.println("Consumer01 接收到消息" + message + "并拒绝签收该消息");
+                //requeue 设置为 false 代表拒绝重新入队 该队列如果配置了死信交换机将发送到死信队列中
+                channel.basicReject(delivery.getEnvelope().getDeliveryTag(), false);
+            } else {
+                System.out.println("Consumer01 接收到消息" + message);
+                channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+            }
+        };
+        boolean autoAck = false;
+        channel.basicConsume(normalQueue, autoAck, deliverCallback, consumerTag -> {
+        });
+    }
+}
+
+
+
+Consumer01 接收到消息info1
+Consumer01 接收到消息info2
+Consumer01 接收到消息info3
+Consumer01 接收到消息info4
+Consumer01 接收到消息info5并拒绝签收该消息
+Consumer01 接收到消息info6
+Consumer01 接收到消息info7
+Consumer01 接收到消息info8
+Consumer01 接收到消息info9
+Consumer01 接收到消息info10
+```
+
+![](http://hinzzz.oss-cn-shenzhen.aliyuncs.com/dead-reject1.png?Expires=32500886400&OSSAccessKeyId=LTAI4G9rkBZLb3G51wiGr2sS&Signature=%2FldOdgDmJXF8%2FWBBugRc2QmAXtk%3D)
+
+![](http://hinzzz.oss-cn-shenzhen.aliyuncs.com/dead_reject.png?Expires=32500886400&OSSAccessKeyId=LTAI4G9rkBZLb3G51wiGr2sS&Signature=WOWEopGFRDG8x1o0itsKFSjjNU8%3D)
+
+
+
+#### 八、延迟队列
+
+> 延时队列：队列内部是有序的，最重要的特性体现在它的延时属性上，延时队列中的元素是希望在指定时间之前或者之后取出处理，简单来说，延时队列就是用来存放需要在指定时间被处理的元素队列
+
+##### 1、使用场景
+
++ 订单在30分钟之内不支付取消订单
++ 新创建的店铺，如果在十天内没有上传商品，则自定发送消息提醒
++ 用户注册成功后，如果三天内没有登录自动提醒
++ 用户发起退款，如果三天内没有处理则自动通知相关运营人员
++ 预订会议后，需要在会议前10分钟通知相关人员
+
+
+
+> ​		这些场景都有一个特点，需要在某个事件发生之后或者之前的指定时间点完成某一项任务，如：
+> 发生订单生成事件，在十分钟之后检查该订单支付状态，然后将未支付的订单进行关闭；看起来似乎
+> 使用定时任务，一直轮询数据，每秒查一次，取出需要被处理的数据，然后处理不就完事了吗？如果
+> 数据量比较少，确实可以这样做，比如：对于“如果账单一周内未支付则进行自动结算”这样的需求，
+> 如果对于时间不是严格限制，而是宽松意义上的一周，那么每天晚上跑个定时任务检查一下所有未支
+> 付的账单，确实也是一个可行的方案。但对于数据量比较大，并且时效性较强的场景，如：“订单十
+> 分钟内未支付则关闭“，短期内未支付的订单数据可能会有很多，活动期间甚至会达到百万甚至千万
+> 级别，对这么庞大的数据量仍旧使用轮询的方式显然是不可取的，很可能在一秒内无法完成所有订单
+> 的检查，同时会给数据库带来很大压力，无法满足业务要求而且性能低下。  
