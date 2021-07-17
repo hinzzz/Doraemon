@@ -9,8 +9,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-@SpringBootTest
+//@SpringBootTest
 class RabbitmqApplicationTests {
+
+
+    @Test
+    void fun(){
+
+
+    }
 
 
     @Test

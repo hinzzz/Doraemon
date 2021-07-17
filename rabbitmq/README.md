@@ -1164,3 +1164,141 @@ Consumer01 接收到消息info10
 > 分钟内未支付则关闭“，短期内未支付的订单数据可能会有很多，活动期间甚至会达到百万甚至千万
 > 级别，对这么庞大的数据量仍旧使用轮询的方式显然是不可取的，很可能在一秒内无法完成所有订单
 > 的检查，同时会给数据库带来很大压力，无法满足业务要求而且性能低下。  
+
+
+
+![](http://hinzzz.oss-cn-shenzhen.aliyuncs.com/purchase_order_uml.png?Expires=32500886400&OSSAccessKeyId=LTAI4G9rkBZLb3G51wiGr2sS&Signature=Nj2fjdCETUdESl3O%2BXswPHw2VBw%3D)
+
+##### 2、TTL
+
+> TTL：表明一条消息或一个队列最大存活时间，若超过这个时间，消息将变成死信，或者队列中所有的消息都变成死信。如果队列和消息都设置了TTL属性，那么最小的那个值生效。
+
+###### 1、给消息设置ttl
+
+```java
+package com.hinz.rabbitmq.deadqueue.ttl;
+
+import com.hinz.rabbitmq.utils.RabbitMQUtils;
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.BuiltinExchangeType;
+import com.rabbitmq.client.Channel;
+
+import java.nio.charset.StandardCharsets;
+
+
+public class MsgTTLProd {
+    public static void main(String[] args) {
+        Channel channel = RabbitMQUtils.getChannel();
+        try {
+            channel.exchangeDeclare("msg-ttl", BuiltinExchangeType.DIRECT);
+            channel.queueDeclare("msg-ttl", true, false, false, null);
+            channel.queueBind("msg-ttl", "msg-ttl", "msg-ttl");
+            //给消息单独设置属性，链式编程（构建器模式，也是一种设计模式）
+            AMQP.BasicProperties properties = new AMQP.BasicProperties.Builder()
+                    .deliveryMode(2) //持久化消息
+                    .contentEncoding("UTF-8") //消息编码
+                    .expiration("10000") //TTL消息，10秒过期
+                    .build();
+
+            channel.basicPublish("msg-ttl", "msg-ttl", properties, "hello message ttl".getBytes(StandardCharsets.UTF_8));
+            System.out.println("消息发送完毕-->");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+```
+
+
+
+###### 2、给队列设置ttl
+
+```java
+package com.hinz.rabbitmq.deadqueue.ttl;
+
+import com.hinz.rabbitmq.utils.RabbitMQUtils;
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.BuiltinExchangeType;
+import com.rabbitmq.client.Channel;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class QueueTTLProd {
+    private static final String NORMAL_EXCHANGE = "normal_exchange";
+    private static final String DEAD_EXCHANGE = "dead_exchange";
+
+    public static void main(String[] argv) throws Exception {
+        try (Channel channel = RabbitMQUtils.getChannel()) {
+            channel.exchangeDeclare(NORMAL_EXCHANGE, BuiltinExchangeType.DIRECT);
+            //设置消息的 TTL 时间
+            AMQP.BasicProperties properties = new
+                    AMQP.BasicProperties().builder().expiration("10000").build();
+            Map<String, Object> params = new HashMap<>();
+            //正常队列设置死信交换机 参数 key 是固定值
+            params.put("x-dead-letter-exchange", DEAD_EXCHANGE);
+            //正常队列设置死信 routing-key 参数 key 是固定值
+            params.put("x-dead-letter-routing-key", "lisi");
+            channel.queueDeclare("normal_exchange",false,false,false,params);
+            channel.queueBind("normal_exchange",NORMAL_EXCHANGE,"zhangsan");
+
+            //该信息是用作演示队列个数限制
+            for (int i = 1; i < 11; i++) {
+                String message = "info" + i;
+                channel.basicPublish(NORMAL_EXCHANGE, "zhangsan", properties,
+                        message.getBytes());
+                System.out.println("生产者发送消息:" + message);
+            }
+        }
+    }
+}
+
+```
+
+
+
+##### 3、两种方式的区别
+
+如果设置了队列的 TTL 属性，那么一旦消息过期，就会被队列丢弃(如果配置了死信队列被丢到死信队
+列中)，而第二种方式，消息即使过期，也不一定会被马上丢弃，因为消息是否过期是在即将投递到消费者
+之前判定的，如果当前队列有严重的消息积压情况，则已过期的消息也许还能存活较长时间；另外，还需
+要注意的一点是，如果不设置 TTL，表示消  
+
+
+
+##### 4.队列配置参数
+
++ x-message-ttl：Number
+  1个发布的消息在队列中存在多长时间后被取消（单位毫秒）；
+
++ x-expires：Number
+  当Queue（队列）在指定的时间未被访问，则队列将被自动删除；
+
++ x-max-length：Number
+  队列所能容下消息的最大长度。当超出长度后，新消息将会覆盖最前面的消息，类似于Redis的LRU算法；
+
++ x-max-length-bytes：Number
+  限定队列的最大占用空间，当超出后也使用类似于Redis的LRU算法；
+
++ x-overflow：String
+  设置队列溢出行为。这决定了当达到队列的最大长度时，消息会发生什么，有效值为Drop Head或Reject Publish；
+
++ x-dead-letter-exchange：String
+  有时候我们希望当队列的消息达到上限后溢出的消息不会被删除掉，而是走到另一个队列中保存起来；
+
++ x-dead-letter-routing-key：String
+  如果不定义，则默认为溢出队列的routing-key，因此，一般和6一起定义；
+
++ x-max-priority：Number
+  如果将一个队列加上优先级参数，那么该队列为优先级队列；
+  1）、给队列加上优先级参数使其成为优先级队列
+  x-max-priority=10【0-255取值范围】
+  2）、给消息加上优先级属性
+  通过优先级特性，将一个队列实现插队消费；
+
++ x-queue-mode：String
+  队列类型x-queue-mode=lazy懒队列，在磁盘上尽可能多地保留消息以减少RAM使用，如果未设置，则队列将保留内存缓存以尽可能快地传递消息；
+
++ x-queue-master-locator：String
+  将队列设置为主位置模式，确定在节点集群上声明时队列主位置所依据的规则；
