@@ -1,0 +1,6 @@
+spring:
+  redis:
+    host: www.xieguangda.com
+    port: 6379
+
+
