@@ -5,7 +5,8 @@ spring:
   application:
     name: aop
 
-
+server:
+  port: 8080
 
 
 redisson:

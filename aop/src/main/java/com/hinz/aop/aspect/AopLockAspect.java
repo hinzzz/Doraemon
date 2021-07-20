@@ -46,8 +46,10 @@ public class AopLockAspect {
         EvaluationContext context = initEvaluationContext(joinPoint);
 
         AopLock aopLock = method.getAnnotation(AopLock.class);
+        log.info("waitTime:{},leaseTime:{},spEl:{}",aopLock.waitTime(),aopLock.leaseTime(),aopLock.value());
         String spEl = aopLock.value();
         String expressionValue = lockKeyPrefix + ":" + PARSER.parseExpression(spEl).getValue(context);
+        log.info("expressionValue:{}",expressionValue);
         RLock lock = redissonClient.getLock(expressionValue);
         try {
             boolean getterLock = lock.tryLock(aopLock.waitTime(), aopLock.leaseTime(), TimeUnit.SECONDS);
