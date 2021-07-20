@@ -2,5 +2,31 @@ spring:
   redis:
     host: www.xieguangda.com
     port: 6379
+  application:
+    name: aop
 
 
+
+
+redisson:
+  address: www.xieguangda.top:6379
+  password: 1qaz@WSX
+  timeout: 3000
+  connectionPoolSize: 64
+  #最小空闲连接数
+  connectionMinimumIdleSize: 10
+
+
+
+  #哨兵模式
+  #master-name: mymaster
+  #password: xxxx
+  #sentinel-addresses: 10.47.91.83:26379,10.47.91.83:26380,10.47.91.83:26381
+  #主节点的连接池中连接数最大值
+  #masterConnectionPoolSize: 250
+  #从节点的连接池中连接数最大值
+  #slaveConnectionPoolSize: 250
+  #从节点最小空闲连接数
+  #slaveConnectionMinimumIdleSize: 15
+  #主节点最小空闲连接数
+  #masterConnectionMinimumIdleSize: 10

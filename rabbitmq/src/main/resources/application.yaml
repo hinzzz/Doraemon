@@ -1,6 +1,6 @@
 spring:
   rabbitmq:
-    host: www.xieguangda.com
+    host: www.xieguangda.top
     port: 5672
     username: admin
     password: admin

@@ -20,13 +20,13 @@ import java.util.Arrays;
 @Order(2)
 public class AopLogAspect {
 
-    @Around("@annotation(cn.com.bluemoon.mh.common.aop.annos.AopLog)")
+    /*@Around("@annotation(com.hinz.aop.AopLog)")
     public Object log(ProceedingJoinPoint joinPoint) throws Throwable {
         Object[] parameters = joinPoint.getArgs();
         String classMethod = joinPoint.getSignature().getDeclaringType().getSimpleName() + "#" + joinPoint.getSignature().getName();
         Object resObj = joinPoint.proceed(parameters);
         log.info("req:{}\nargs:{}\nres:{}", classMethod, Arrays.toString(parameters), resObj);
         return resObj;
-    }
+    }*/
 
 }

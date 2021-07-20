@@ -39,6 +39,7 @@ public class Consumer01 {
             if (message.equals("info5")) {
                 System.out.println("Consumer01 接收到消息" + message + "并拒绝签收该消息");
                 //requeue 设置为 false 代表拒绝重新入队 该队列如果配置了死信交换机将发送到死信队列中
+                //               true  则重新入队，而不是丢入死信队列
                 channel.basicReject(delivery.getEnvelope().getDeliveryTag(), false);
             } else {
                 System.out.println("Consumer01 接收到消息" + message);
