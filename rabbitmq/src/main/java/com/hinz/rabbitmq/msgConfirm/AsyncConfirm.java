@@ -51,8 +51,8 @@ public class AsyncConfirm {
              */
             channel.addConfirmListener(confirmCallback,nackCallback);
             long begin = System.currentTimeMillis();
-            for (int i = 0; i < 1000; i++) {
-                String msg = i+"";
+            for (int i = 0; i < 100000; i++) {
+                String msg = "{\"msg\":\"操作成功\",\"code\":200,\"permissions\":[\"*:*:*\"],\"roles\":[\"admin\"],\"user\":{\"searchValue\":null,\"createBy\":\"admin\",\"createTime\":\"2018-03-16 11:33:00\",\"updateBy\":null,\"updateTime\":null,\"remark\":\"管理员\",\"params\":{},\"userId\":1,\"deptId\":100,\"userName\":\"admin\",\"nickName\":\"若依\",\"email\":\"ry@163.com\",\"phonenumber\":\"15915812149\",\"sex\":\"1\",\"avatar\":null,\"passwordSalt\":\"4b4c8177-402b-11eb-a43b-00163e06caab\",\"status\":\"0\",\"delFlag\":\"0\",\"loginIp\":\"127.0.0.1\",\"loginDate\":1521171180000,\"dept\":{\"searchValue\":null,\"createBy\":null,\"createTime\":null,\"updateBy\":null,\"updateTime\":null,\"remark\":null,\"params\":{},\"deptId\":100,\"parentId\":0,\"ancestors\":null,\"deptName\":\"管理\",\"orderNum\":\"0\",\"leader\":\"lzj\",\"phone\":null,\"email\":null,\"status\":\"0\",\"delFlag\":null,\"parentName\":null,\"children\":[]},\"roles\":[{\"searchValue\":null,\"createBy\":null,\"createTime\":null,\"updateBy\":null,\"updateTime\":null,\"remark\":null,\"params\":{},\"roleId\":1,\"roleName\":\"超级管理员\",\"roleKey\":\"admin\",\"roleSort\":\"1\",\"dataScope\":\"1\",\"menuCheckStrictly\":false,\"deptCheckStrictly\":false,\"status\":\"0\",\"delFlag\":null,\"flag\":false,\"menuIds\":null,\"deptIds\":null,\"admin\":true}],\"roleIds\":null,\"postIds\":null,\"admin\":true}}";
                 /**
                  * channel.getNextPublishSeqNo() 获取下一个消息的序列号
                  * 通过序列号与消息体进行关联

@@ -5,7 +5,7 @@ import com.hinz.spring.service.HelloProcessor;
 
 public class HelloProcessor2 implements HelloProcessor {
 
-    @ServiceLog
+    //@ServiceLog
     @Override
     public void say() {
         System.out.println("22222222");

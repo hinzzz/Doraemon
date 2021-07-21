@@ -1172,6 +1172,8 @@ Consumer01 接收到消息info10
 ##### 2、TTL
 
 > TTL：表明一条消息或一个队列最大存活时间，若超过这个时间，消息将变成死信，或者队列中所有的消息都变成死信。如果队列和消息都设置了TTL属性，那么最小的那个值生效。
+>
+> **如果使用在消息属性上设置 TTL 的方式，消息可能并不会按时“死亡“，因为 RabbitMQ 只会检查第一个消息是否过期，如果过期则丢到死信队列，如果第一个消息的延时时长很长，而第二个消息的延时时长很短，第二个消息并不会优先得到执行。**  
 
 ###### 1、给消息设置ttl
 
@@ -1302,3 +1304,242 @@ public class QueueTTLProd {
 
 + x-queue-master-locator：String
   将队列设置为主位置模式，确定在节点集群上声明时队列主位置所依据的规则；
+
+
+
+
+
+
+
+
+
+#### 九、整合SpringBoot
+
+```java
+package com.hinz.rabbitmq.config;
+
+import org.springframework.amqp.core.*;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@Configuration
+public class RabbitMQConfig {
+
+    public static final String X_EXCHANGE = "X";
+    public static final String QUEUE_A = "QA";
+    public static final String QUEUE_B = "QB";
+    public static final String QUEUE_C = "QC";
+
+    public static final String DEAD_EXCHANGE = "Y";
+    public static final String DEAD_QUEUE = "QD";
+
+
+    @Bean("xExchange")
+    public DirectExchange getXExchange(){
+        return new DirectExchange(X_EXCHANGE);
+    }
+
+    @Bean("dExchange")
+    public DirectExchange getDExchange(){
+        return new DirectExchange(DEAD_EXCHANGE);
+    }
+
+
+    //声明队列a ttl为10 并绑定死信交换机D
+    @Bean("aQueue")
+    public Queue getAQueue(){
+        Map<String,Object> params = new HashMap<>(3);
+        //声明当前队列绑定的死信交换机
+        params.put("x-dead-letter-exchange",DEAD_EXCHANGE);
+        //声明死信的路由key
+        params.put("x-dead-letter-routing-key","DD");
+        //声明队列的ttl
+        params.put("x-message-ttl",10000);
+        return QueueBuilder.durable(QUEUE_A).withArguments(params).build();
+    }
+
+    //声明队列A绑定交换机X
+    @Bean
+    public Binding getAQueueBindXExchange(@Qualifier("xExchange") DirectExchange exchange,
+                                          @Qualifier("aQueue") Queue queue){
+        return BindingBuilder.bind(queue).to(exchange).with("XA");
+    }
+
+    //声明队列B ttl为40 并帮顶死信交换机D
+    @Bean("bQueue")
+    public Queue getBQueue(){
+        Map<String,Object> params = new HashMap<>(3);
+        //声明当前队列绑定的死信交换机
+        params.put("x-dead-letter-exchange",DEAD_EXCHANGE);
+        //声明死信的路由key
+        params.put("x-dead-letter-routing-key","DD");
+        //声明队列的ttl
+        params.put("x-message-ttl",40000);
+        return QueueBuilder.durable(QUEUE_B).withArguments(params).build();
+    }
+
+
+
+    //声明队列B 绑定交换机X
+    @Bean
+    public Binding getBQueueBindXExchange(@Qualifier("xExchange") DirectExchange exchange,
+                                          @Qualifier("bQueue") Queue queue){
+        return BindingBuilder.bind(queue).to(exchange).with("XB");
+    }
+
+    //声明死信队列
+    @Bean("dQueue")
+    public Queue getDQueue(){
+        return new Queue(DEAD_QUEUE);
+    }
+
+    //声明死信队列d 绑定死信交换机
+    @Bean
+    public Binding getDQueueBindDExchange(@Qualifier("dExchange") DirectExchange exchange,
+                                          @Qualifier("dQueue") Queue queue){
+        return BindingBuilder.bind(queue).to(exchange).with("DD");
+    }
+
+
+
+    @Bean("cQueue")
+    public Queue getCQueue(){
+        Map<String,Object> params = new HashMap<>(3);
+        //声明当前队列绑定的死信交换机
+        params.put("x-dead-letter-exchange",DEAD_EXCHANGE);
+        //声明死信的路由key
+        params.put("x-dead-letter-routing-key","DD");
+        return QueueBuilder.durable(QUEUE_C).withArguments(params).build();
+    }
+
+
+    @Bean
+    public Binding getCQueueBindXExchange(@Qualifier("cQueue")Queue queue,
+                                          @Qualifier("xExchange") DirectExchange exchange ){
+        return BindingBuilder.bind(queue).to(exchange).with("XC");
+    }
+
+}
+
+```
+
+```java
+package com.hinz.rabbitmq.consumer;
+
+import com.rabbitmq.client.Channel;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
+
+import java.util.Date;
+
+/**
+ * @author hinzzz
+ * @date 2021/7/20 16:56
+ * @desc
+ */
+@Slf4j
+@Component
+public class DeadQueueConsumer {
+
+    @RabbitListener(queues = "QD")
+    public void receiveMsg(Message msg, Channel channel){
+        log.info("当前时间：{}，收到死信队列的消息：{}",new Date(),new String(msg.getBody()));
+    }
+
+}
+```
+
+```java
+package com.hinz.rabbitmq.controller;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Date;
+
+/**
+ * @author hinzzz
+ * @date 2021/7/20 16:23
+ * @desc
+ */
+@Slf4j
+@RequestMapping("ttl")
+@RestController
+public class SendMsgController {
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @GetMapping("send/{msg}")
+    public String send(@PathVariable String msg){
+        log.info("当前时间：{},发一条消息给两个ttl队列：{}",new Date(),msg);
+        rabbitTemplate.convertAndSend("X","XA",msg);
+        rabbitTemplate.convertAndSend("X","XB",msg);
+        return "ok";
+    }
+
+    /**
+     * 消费端设置自定义ttl
+     * @param msg
+     * @param ttlTime
+     * @return
+     */
+    @GetMapping("autoSend/{msg}/{ttlTime}")
+    public String autoSend(@PathVariable String msg,@PathVariable String ttlTime){
+        rabbitTemplate.convertAndSend("X","XC",msg, correlationData->{
+            correlationData.getMessageProperties().setExpiration(ttlTime);
+            return correlationData;
+        });
+        return "ok";
+    }
+}
+```
+
+
+
+每增加一个新的时间需求，就要新增一个队列，无法满足个性化需求
+
+
+
+##### 1、延迟队列插件
+
+##### 2、安装步骤
+
+[插件地址]: https://www.rabbitmq.com/community-plugins.html
+
+
+
+```powershell
+# 将下载的插件拷贝到docker容器中
+docker cp /mydata/rabbitmq/plugins/rabbitmq_delayed_message_exchange-3.8.0.ez 972bd874b38b:/plugins
+#进入容器
+docker exec -it 972 /bin/bash
+#启用插件
+rabbitmq-plugins enable rabbitmq_delayed_message_exchange
+#查看插件
+rabbitmq-plugins list
+#重新启动容器
+docker restart 972
+```
+
+
+
+
+
+未安装之前
+
+![]( http://hinzzz.oss-cn-shenzhen.aliyuncs.com/default_add_exchange.png?Expires=32500886400&OSSAccessKeyId=LTAI4G9rkBZLb3G51wiGr2sS&Signature=t01BDnmkyzIKiH9gWt5WSYso9rY%3D)
+
+![](http://hinzzz.oss-cn-shenzhen.aliyuncs.com/after_add_exchange.png?Expires=32500886400&OSSAccessKeyId=LTAI4G9rkBZLb3G51wiGr2sS&Signature=419VgHbeNu2KlGDgMqF2SL23M5k%3D)

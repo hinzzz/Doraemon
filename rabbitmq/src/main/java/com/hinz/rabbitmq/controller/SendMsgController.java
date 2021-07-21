@@ -1,6 +1,7 @@
 package com.hinz.rabbitmq.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +29,21 @@ public class SendMsgController {
         log.info("当前时间：{},发一条消息给两个ttl队列：{}",new Date(),msg);
         rabbitTemplate.convertAndSend("X","XA",msg);
         rabbitTemplate.convertAndSend("X","XB",msg);
+        return "ok";
+    }
+
+    /**
+     * 消费端设置自定义ttl
+     * @param msg
+     * @param ttlTime
+     * @return
+     */
+    @GetMapping("autoSend/{msg}/{ttlTime}")
+    public String autoSend(@PathVariable String msg,@PathVariable String ttlTime){
+        rabbitTemplate.convertAndSend("X","XC",msg, correlationData->{
+            correlationData.getMessageProperties().setExpiration(ttlTime);
+            return correlationData;
+        });
         return "ok";
     }
 }

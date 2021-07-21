@@ -14,6 +14,7 @@ public class RabbitMQConfig {
     public static final String X_EXCHANGE = "X";
     public static final String QUEUE_A = "QA";
     public static final String QUEUE_B = "QB";
+    public static final String QUEUE_C = "QC";
 
     public static final String DEAD_EXCHANGE = "Y";
     public static final String DEAD_QUEUE = "QD";
@@ -83,6 +84,25 @@ public class RabbitMQConfig {
     public Binding getDQueueBindDExchange(@Qualifier("dExchange") DirectExchange exchange,
                                           @Qualifier("dQueue") Queue queue){
         return BindingBuilder.bind(queue).to(exchange).with("DD");
+    }
+
+
+
+    @Bean("cQueue")
+    public Queue getCQueue(){
+        Map<String,Object> params = new HashMap<>(3);
+        //声明当前队列绑定的死信交换机
+        params.put("x-dead-letter-exchange",DEAD_EXCHANGE);
+        //声明死信的路由key
+        params.put("x-dead-letter-routing-key","DD");
+        return QueueBuilder.durable(QUEUE_C).withArguments(params).build();
+    }
+
+
+    @Bean
+    public Binding getCQueueBindXExchange(@Qualifier("cQueue")Queue queue,
+                                          @Qualifier("xExchange") DirectExchange exchange ){
+        return BindingBuilder.bind(queue).to(exchange).with("XC");
     }
 
 }
