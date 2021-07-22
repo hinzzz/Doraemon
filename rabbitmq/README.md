@@ -1515,6 +1515,12 @@ public class SendMsgController {
 
 ##### 1、延迟队列插件
 
+> 上面提到的问题：
+>
+> 如果使用在消息属性上设置 TTL 的方式，消
+> 息可能并不会按时“死亡“，因为 RabbitMQ 只会检查第一个消息是否过期，如果过期则丢到死信队列，
+> 如果第一个消息的延时时长很长，而第二个消息的延时时长很短，第二个消息并不会优先得到执行。  
+
 ##### 2、安装步骤
 
 [插件地址]: https://www.rabbitmq.com/community-plugins.html
@@ -1542,4 +1548,17 @@ docker restart 972
 
 ![]( http://hinzzz.oss-cn-shenzhen.aliyuncs.com/default_add_exchange.png?Expires=32500886400&OSSAccessKeyId=LTAI4G9rkBZLb3G51wiGr2sS&Signature=t01BDnmkyzIKiH9gWt5WSYso9rY%3D)
 
+安装之后
+
 ![](http://hinzzz.oss-cn-shenzhen.aliyuncs.com/after_add_exchange.png?Expires=32500886400&OSSAccessKeyId=LTAI4G9rkBZLb3G51wiGr2sS&Signature=419VgHbeNu2KlGDgMqF2SL23M5k%3D)
+
+
+
+##### 3、自定义交换机
+
+> 自定义一种新的交换类型，该类型支持延迟投递机制，消息传递后并不会立即投递到目标队列中，而是存储在mnesia（一个分布式数据系统）中，当达到投递时间时，才会投递到目标队列中
+
+
+
+
+
