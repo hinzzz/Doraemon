@@ -16,7 +16,7 @@ import java.util.Date;
 @Slf4j
 public class DelayedMsgConsumer {
 
-    @RabbitListener(queues = "delayedQueue")
+    @RabbitListener(queues = "delayed_queue")
     public void receiveDelayQueue(Message msg){
       log.info("当前时间：{}，接收到队列delayed_queue的消息：{}",new Date(),new String(msg.getBody()));
     }

@@ -44,6 +44,7 @@ public class SendMsgController {
             correlationData.getMessageProperties().setExpiration(ttlTime);
             return correlationData;
         });
+        log.info("当前时间：{},发送消息成功：{}，过期时间：{}",new Date(),msg,ttlTime);
         return "ok";
     }
 }

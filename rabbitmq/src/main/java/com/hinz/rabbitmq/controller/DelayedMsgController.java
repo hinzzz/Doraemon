@@ -28,7 +28,7 @@ public class DelayedMsgController {
             correlationData.getMessageProperties().setDelay(ttl);
             return correlationData;
         });
-        log.info("当前时间：{}，发送消息：{}",new Date(),msg);
+        log.info("当前时间：{}，发送消息：{}，过期时间：{}",new Date(),msg,ttl);
         return "ok";
     }
 

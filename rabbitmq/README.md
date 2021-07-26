@@ -1507,6 +1507,10 @@ public class SendMsgController {
 }
 ```
 
+> **如果使用在消息属性上设置 TTL 的方式，消息可能并不会按时“死亡“，因为 RabbitMQ 只会检查第一个消息是否过期，如果过期则丢到死信队列，如果第一个消息的延时时长很长，而第二个消息的延时时长很短，第二个消息并不会优先得到执行。**  
+
+![](http://hinzzz.oss-cn-shenzhen.aliyuncs.com/msg-ttl1.png?Expires=32500886400&OSSAccessKeyId=LTAI4G9rkBZLb3G51wiGr2sS&Signature=c8VDbRhlbPY2qNRTjGH8Oq95sA4%3D)
+
 
 
 每增加一个新的时间需求，就要新增一个队列，无法满足个性化需求
@@ -1560,5 +1564,132 @@ docker restart 972
 
 
 
+```java
+package com.hinz.rabbitmq.config;
 
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.CustomExchange;
+import org.springframework.amqp.core.Queue;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * @author hinzzz
+ * @date 2021/7/22 11:04
+ * @desc 延迟队列插件
+ */
+
+@Configuration
+public class DelayedQueueConfig {
+
+    public static final String DELAYED_QUEUE = "delayed_queue";
+    public static final String DELAYED_EXCHANGE = "delayed_exchange";
+    public static final String ROUTING_KEY = "delayed_key";
+
+
+    /**
+     * 自定义交换机
+     * @return
+     */
+    @Bean("delayedExchange")
+    public CustomExchange delayedExchange(){
+        Map<String,Object> map  = new HashMap<>();
+        map.put("x-delayed-type","direct");
+        return new CustomExchange(DELAYED_EXCHANGE,"x-delayed-message",true,false,map);
+    }
+
+    @Bean("delayedQueue")
+    public Queue getDelayedQueue(){
+        return new Queue(DELAYED_QUEUE);
+    }
+
+    @Bean
+    public Binding getDelayedQueueBindDelayedExchange(@Qualifier("delayedExchange") CustomExchange exchange,
+    @Qualifier("delayedQueue") Queue queue){
+        return BindingBuilder.bind(queue).to(exchange).with(ROUTING_KEY).noargs();
+    }
+}
+
+```
+
+```java
+package com.hinz.rabbitmq.consumer;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
+
+import java.util.Date;
+
+/**
+ * @author hinzzz
+ * @date 2021/7/22 14:18
+ * @desc
+ */
+@Component
+@Slf4j
+public class DelayedMsgConsumer {
+
+    @RabbitListener(queues = "delayed_queue")
+    public void receiveDelayQueue(Message msg){
+      log.info("当前时间：{}，接收到队列delayed_queue的消息：{}",new Date(),new String(msg.getBody()));
+    }
+}
+
+```
+
+```java
+package com.hinz.rabbitmq.controller;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Date;
+
+/**
+ * @author hinzzz
+ * @date 2021/7/22 14:12
+ * @desc
+ */
+@RestController
+@RequestMapping("delay")
+@Slf4j
+public class DelayedMsgController {
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @RequestMapping("sendMsg/{msg}/{ttl}")
+    public Object sendMsg(@PathVariable String msg,@PathVariable Integer ttl){
+        rabbitTemplate.convertAndSend("delayed_exchange","delayed_key",msg,correlationData->{
+            correlationData.getMessageProperties().setDelay(ttl);
+            return correlationData;
+        });
+        log.info("当前时间：{}，发送消息：{}，过期时间：{}",new Date(),msg,ttl);
+        return "ok";
+    }
+
+}
+
+```
+
+**先过期的消息优先被消费**
+
+![](http://hinzzz.oss-cn-shenzhen.aliyuncs.com/msg-ttl2.png?Expires=32500886400&OSSAccessKeyId=LTAI4G9rkBZLb3G51wiGr2sS&Signature=T%2BXeuUA%2Fgfvz%2BGxEdBNgOrOrOfg%3D)
+
+
+
+
+
+##### 4、发布确认
 
