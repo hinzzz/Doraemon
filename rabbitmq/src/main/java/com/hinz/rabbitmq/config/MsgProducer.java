@@ -5,7 +5,6 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,7 +26,7 @@ public class MsgProducer implements RabbitTemplate.ConfirmCallback, RabbitTempla
          * true：交换机无法将消息进行路由时，会将该消息返回给生产者
          * false：如果发现消息无法路由 直接丢弃
          */
-        rabbitTemplate.setMandatory(true);
+        //rabbitTemplate.setMandatory(true);
         rabbitTemplate.setReturnCallback(this::returnedMessage);
     }
 
@@ -35,12 +34,23 @@ public class MsgProducer implements RabbitTemplate.ConfirmCallback, RabbitTempla
     public void sendMsg(@PathVariable String msg){
         //让消息绑定一个id值
         CorrelationData correlationData = new CorrelationData("111");
-        rabbitTemplate.convertAndSend("confirm.exchange","key1",msg+"key1",correlationData);
+        rabbitTemplate.convertAndSend("confirm_exchange","key1",msg+"key1",correlationData);
         log.info("发送消息id：{},内容：{}",correlationData.getId(),msg+"key1");
-
         CorrelationData correlationData2 = new CorrelationData("222");
-        rabbitTemplate.convertAndSend("confirm.exchange","key2",msg+"key2",correlationData2);
+        rabbitTemplate.convertAndSend("confirm_exchange","key2",msg+"key2",correlationData2);
         log.info("发送消息id：{},内容：{}",correlationData2.getId(),msg+"key2");
+
+        CorrelationData correlationData3 = new CorrelationData("333");
+        rabbitTemplate.convertAndSend("confirm_exchange_aaa","key1",msg+"key1",correlationData3);
+        log.info("发送消息id：{},内容：{}",correlationData3.getId(),msg+"key1");
+    }
+
+
+    @GetMapping("/backupExchange/{msg}")
+    public void backupExhchange(@PathVariable String msg){
+        CorrelationData correlationData3 = new CorrelationData("backupExchange");
+        rabbitTemplate.convertAndSend("confirm_exchange","nokey",msg+"key1",correlationData3);
+        log.info("发送消息id：{},内容：{}",correlationData3.getId(),msg+"key1");
     }
 
     @Override

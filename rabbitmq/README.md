@@ -1,3 +1,7 @@
+---
+
+---
+
 ### RabbitMQ
 
 #### 一、工作队列
@@ -1695,6 +1699,173 @@ public class DelayedMsgController {
 
 
 
+![image-20210728154304317](http://hinzzz.oss-cn-shenzhen.aliyuncs.com/img/hinzzzimage-20210728154304317.png)
+
+
+
+```properties
+##开启发布确认 spring配置文件
+spring.rabbitmq.publisher-confirm-type=correlated
+NONE:禁用发布确认模式。默认值
+correlated：发布消息到交换机后触发回调方法
+simple:发布消息成功后调用waitForConfirms	效果和correlated一致，调用waitForConfirmOrDie等待返回结果，若返回的结果为false,channel通道则会关闭 无法发送消息 相当于同步确认
+    
+```
+
+```java
+
+package com.hinz.rabbitmq.config;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.PostConstruct;
+
+@Slf4j
+@RestController
+public class MsgProducer implements RabbitTemplate.ConfirmCallback, RabbitTemplate.ReturnCallback {
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    //rabbitTemplate注入之后设置该值
+    @PostConstruct
+    private void init(){
+        rabbitTemplate.setConfirmCallback(this::confirm);
+        /**
+         * true：交换机无法将消息进行路由时，会将该消息返回给生产者
+         * false：如果发现消息无法路由 直接丢弃
+         */
+        rabbitTemplate.setMandatory(true);
+        rabbitTemplate.setReturnCallback(this::returnedMessage);
+    }
+
+    @GetMapping("sendMsg/{msg}")
+    public void sendMsg(@PathVariable String msg){
+        //让消息绑定一个id值
+        CorrelationData correlationData = new CorrelationData("111");
+        rabbitTemplate.convertAndSend("confirm_exchange","key1",msg+"key1",correlationData);
+        log.info("发送消息id：{},内容：{}",correlationData.getId(),msg+"key1");
+
+        CorrelationData correlationData2 = new CorrelationData("222");
+        rabbitTemplate.convertAndSend("confirm_exchange_key2","key1",msg+"key2",correlationData2);
+        log.info("发送消息id：{},内容：{}",correlationData2.getId(),msg+"key2");
+
+        CorrelationData correlationData3 = new CorrelationData("333");
+        rabbitTemplate.convertAndSend("confirm_exchange","key3",msg+"key3",correlationData3);
+        log.info("发送消息id：{},内容：{}",correlationData3.getId(),msg+"key3");
+    }
+
+    @Override
+    public void returnedMessage(Message message, int replyCode, String replyText, String exchange, String routingKey) {
+        log.info("消息：{}被退回，原因是：{}，交换机是：{}，routingKey是：{}",new String(message.getBody()),replyText,exchange,routingKey);
+    }
+
+    @Override
+    public void confirm(CorrelationData correlationData, boolean ack, String cause) {
+        String id = correlationData.getId();
+        if(ack){
+            log.info("交换机收到消息，id：{}",id);
+        }else{
+            log.info("交换机未收到消息id：{}，原因是：{}",id,cause);
+        }
+    }
+}
+
+
+```
+
+
+
+```java
+package com.hinz.rabbitmq.config;
+
+import org.springframework.amqp.core.*;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
+
+/**
+ * @author hinzzz
+ * @date 2021/7/22 15:18
+ * @desc
+ */
+@Component
+public class ConfirmQueueConfig {
+    public static final String CONFIRM_QUEUE = "confirm_queue";
+    public static final String CONFIRM_EXCHANGE = "confirm_exchange";
+
+    @Bean("confirm_queue")
+    public Queue getConfirmQueue() {
+        return QueueBuilder.durable(CONFIRM_QUEUE).build();
+    }
+
+    @Bean("confirm_exchange")
+    public DirectExchange getConfirmExchange(){
+        return new DirectExchange(CONFIRM_EXCHANGE);
+    }
+
+
+    @Bean
+    public Binding getConfirmQueueExchange(@Qualifier("confirm_queue")Queue queue,
+                                           @Qualifier("confirm_exchange")DirectExchange exchange){
+        return BindingBuilder.bind(queue).to(exchange).with("key1");
+    }
+
+}
+
+```
+
+```java
+package com.hinz.rabbitmq.consumer;
+
+import com.rabbitmq.client.Channel;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
+
+/**
+ * @author hinzzz
+ * @date 2021/7/29 16:03
+ * @desc
+ */
+@Component
+@Slf4j
+public class ConfirmConsumer {
+
+    @RabbitListener(queues = "confirm_queue")
+    public void comsume(Message msg, Channel channel){
+        log.info("消息>>>>>>>>>>{} 被消费 ",new String(msg.getBody()));
+    }
+
+}
+
+```
+
+
+
+发送三次消息，第一个消息正常发送，第二个模拟exchange不存在，第三个消息模拟队列不存在，我们来看下运行结果
+
+![image-20210729163917177](http://hinzzz.oss-cn-shenzhen.aliyuncs.com/img/hinzzzimage-20210729163917177.png)
+
+![image-20210729163602428](http://hinzzz.oss-cn-shenzhen.aliyuncs.com/img/hinzzzimage-20210729163602428.png)
+
+
+
+第一个消息被正常消费，第二个消息因为找不到与key2绑定的队列，从控制台rabbitmq控制台可以看出消息直接丢失了，第三条消息因为找不到交换机消息也丢失了
+
+
+
+
+
 
 
 
@@ -1703,7 +1874,180 @@ public class DelayedMsgController {
 
 ###### 1、Mandatory参数
 
-> ​		**在仅开启了生产者确认机制的情况下，交换机接收到信息后，会直接给消息生产者发送确认消息，如果发现该消息不可路由，那么消息会被直接丢弃。**此时生产者是不知道消息被丢弃这件事的。那么如何让无法被路由的消息帮我们想办法处理一下呢？
+> ​		**在仅开启了生产者确认机制的情况下，交换机接收到信息后，会直接给消息生产者发送确认消息，如果发现该消息不可路由（找不到对应的队列），那么消息会被直接丢弃。**此时生产者是不知道消息被丢弃这件事的。那么如何让无法被路由的消息帮我们想办法处理一下呢？
 >
 > ​		通过设置mandatory参数可以在当下拍戏传递过程中不可达目的地时将消息返回给生产者
+
+
+
+```java
+ /**
+         * true：交换机无法将消息进行路由时，会将该消息返回给生产者
+         * false：如果发现消息无法路由 直接丢弃
+         */
+        rabbitTemplate.setMandatory(true);
+```
+
+
+
+##### 6、备份交换机
+
+> 有了 mandatory 参数和回退消息，我们获得了对无法投递消息的感知能力，有机会在生产者的消息
+> 无法被投递时发现并处理。但有时候，我们并不知道该如何处理这些无法路由的消息，最多打个日志，然
+> 后触发报警，再来手动处理。而通过日志来处理这些无法路由的消息是很不优雅的做法，特别是当生产者
+> 所在的服务有多台机器的时候，手动复制日志会更加麻烦而且容易出错。而且设置 mandatory 参数会增
+> 加生产者的复杂性，需要添加处理这些被退回的消息的逻辑。如果既不想丢失消息，又不想增加生产者的
+> 复杂性，该怎么做呢？前面在设置死信队列的文章中，我们提到，可以为队列设置死信交换机来存储那些
+> 处理失败的消息，可是这些不可路由消息根本没有机会进入到队列，因此无法使用死信队列来保存消息。
+> 在 RabbitMQ 中，有一种备份交换机的机制存在，可以很好的应对这个问题。什么是备份交换机呢？备份
+> 交换机可以理解为 RabbitMQ 中交换机的“备胎”，当我们为某一个交换机声明一个对应的备份交换机时，
+> 就是为它创建一个备胎，当交换机接收到一条不可路由消息时，将会把这条消息转发到备份交换机中，由
+> 备份交换机来进行转发和处理，通常备份交换机的类型为 Fanout ，这样就能把所有消息都投递到与其绑
+> 定的队列中，然后我们在备份交换机下绑定一个队列，这样所有那些原交换机无法被路由的消息，就会都
+> 进入这个队列了。当然，我们还可以建立一个报警队列，用独立的消费者来进行监测和报警。  
+
+配置类
+
+```java
+package com.hinz.rabbitmq.config;
+
+import org.springframework.amqp.core.*;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
+
+/**
+ * @author hinzzz
+ * @date 2021/7/22 15:18
+ * @desc
+ */
+@Component
+public class ConfirmQueueConfig {
+    public static final String CONFIRM_QUEUE = "confirm_queue";
+    public static final String CONFIRM_EXCHANGE = "confirm_exchange";
+    public static final String BACKUP_EXCHANGE = "backup_exchange";
+    public static final String BACKUP_QUEUE = "backup_queue";
+    public static final String WARNING_QUEUE = "warning_queue";
+
+    @Bean("confirm_queue")
+    public Queue getConfirmQueue() {
+        return QueueBuilder.durable(CONFIRM_QUEUE).build();
+    }
+
+    @Bean("backup_queue")
+    public Queue getBackupQueue() {
+        return QueueBuilder.durable(BACKUP_QUEUE).build();
+    }
+
+    @Bean("warning_queue")
+    public Queue getWarningQueue() {
+        return QueueBuilder.durable(WARNING_QUEUE).build();
+    }
+
+    @Bean("backup_exchange")
+    public FanoutExchange getBackupExchange(){
+        return new FanoutExchange(BACKUP_EXCHANGE);
+    }
+
+    @Bean
+    public Binding getConfirmQueueExchange(@Qualifier("confirm_queue")Queue queue,
+                                           @Qualifier("confirm_exchange")DirectExchange exchange){
+        return BindingBuilder.bind(queue).to(exchange).with("key1");
+    }
+
+    @Bean("confirm_exchange")
+    public DirectExchange getConfirmExchange(){
+        ExchangeBuilder exchangeBuilder = ExchangeBuilder.directExchange(CONFIRM_EXCHANGE)
+                .durable(true)
+                .withArgument("alternate-exchange", BACKUP_EXCHANGE);
+        return exchangeBuilder.build();
+    }
+
+
+
+   /* @Bean
+    public Binding getConfirmQueueExchange3(@Qualifier("confirm_queue")Queue queue,
+                                            @Qualifier("confirm_exchange")DirectExchange exchange){
+        return BindingBuilder.bind(queue).to(exchange).with("key3");
+    }*/
+
+    @Bean
+    public Binding warningBind(@Qualifier("warning_queue")Queue queue,
+                                            @Qualifier("backup_exchange")FanoutExchange exchange){
+        return BindingBuilder.bind(queue).to(exchange);
+    }
+
+    @Bean
+    public Binding backupBind(@Qualifier("backup_queue")Queue queue,
+                               @Qualifier("backup_exchange")FanoutExchange exchange){
+        return BindingBuilder.bind(queue).to(exchange);
+    }
+
+}
+
+```
+
+消费者
+
+```java
+package com.hinz.rabbitmq.consumer;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
+
+/**
+ * @author hinzzz
+ * @date 2021/8/4 10:27
+ * @desc
+ */
+@Component
+@Slf4j
+public class WarningConsumer {
+
+    @RabbitListener(queues = "warning_queue")
+    public void consumer(Message msg){
+        log.info(">>>>>>>>>>>>>>>>>>>>>>>发现不可路由信息：{}",new String(msg.getBody()));
+    }
+}
+
+```
+
+生产者
+
+```java
+    @GetMapping("/backupExchange/{msg}")
+    public void backupExhchange(@PathVariable String msg){
+        CorrelationData correlationData3 = new CorrelationData("backupExchange");
+        rabbitTemplate.convertAndSend("confirm_exchange","nokey",msg+"key1",correlationData3);
+        log.info("发送消息id：{},内容：{}",correlationData3.getId(),msg+"key1");
+    }
+```
+
+运行结果
+
+![image-20210804111411485](http://hinzzz.oss-cn-shenzhen.aliyuncs.com/img/hinzzzimage-20210804111411485.png)
+
+
+
+
+
+#### 十、其他知识点
+
+##### 1、幂等性
+
+> 用户对于同一操作发起的一次请求或者多次请求的结果是一致的，**不会因为多次点击而产生了副作用。**
+> 举个最简单的例子，那就是支付，用户购买商品后支付，**支付扣款成功，但是返回结果的时候网络异常**，
+> 此时钱已经扣了，用户再次点击按钮，此时会进行第二次扣款，返回结果成功，用户查询余额发现多扣钱
+> 了，流水记录也变成了两条。在以前的单应用系统中，我们只需要把数据操作放入事务中即可，发生错误
+> 立即回滚，但是再响应客户端的时候也有可能出现网络中断或者异常  
+
+
+
+##### 2、消息重复消费
+
+> 消费者在消费 MQ 中的消息时， **MQ 已把消息发送给消费者，消费者在给 MQ 返回 ack 时网络中断**，
+> 故 MQ 未收到确认信息，该条消息会重新发给其他的消费者，或者在网络重连后再次发送给该消费者，但
+> 实际上该消费者已成功消费了该条消息，造成消费者消费了重复的消息。  
 
