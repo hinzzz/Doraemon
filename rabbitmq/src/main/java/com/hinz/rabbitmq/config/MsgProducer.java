@@ -20,7 +20,7 @@ public class MsgProducer implements RabbitTemplate.ConfirmCallback, RabbitTempla
 
     //rabbitTemplate注入之后设置该值
     @PostConstruct
-    private void init(){
+    private void init() {
         rabbitTemplate.setConfirmCallback(this::confirm);
         /**
          * true：交换机无法将消息进行路由时，会将该消息返回给生产者
@@ -31,40 +31,40 @@ public class MsgProducer implements RabbitTemplate.ConfirmCallback, RabbitTempla
     }
 
     @GetMapping("sendMsg/{msg}")
-    public void sendMsg(@PathVariable String msg){
+    public void sendMsg(@PathVariable String msg) {
         //让消息绑定一个id值
         CorrelationData correlationData = new CorrelationData("111");
-        rabbitTemplate.convertAndSend("confirm_exchange","key1",msg+"key1",correlationData);
-        log.info("发送消息id：{},内容：{}",correlationData.getId(),msg+"key1");
+        rabbitTemplate.convertAndSend("confirm_exchange", "key1", msg + "key1", correlationData);
+        log.info("发送消息id：{},内容：{}", correlationData.getId(), msg + "key1");
         CorrelationData correlationData2 = new CorrelationData("222");
-        rabbitTemplate.convertAndSend("confirm_exchange","key2",msg+"key2",correlationData2);
-        log.info("发送消息id：{},内容：{}",correlationData2.getId(),msg+"key2");
+        rabbitTemplate.convertAndSend("confirm_exchange", "key2", msg + "key2", correlationData2);
+        log.info("发送消息id：{},内容：{}", correlationData2.getId(), msg + "key2");
 
         CorrelationData correlationData3 = new CorrelationData("333");
-        rabbitTemplate.convertAndSend("confirm_exchange_aaa","key1",msg+"key1",correlationData3);
-        log.info("发送消息id：{},内容：{}",correlationData3.getId(),msg+"key1");
+        rabbitTemplate.convertAndSend("confirm_exchange_aaa", "key1", msg + "key1", correlationData3);
+        log.info("发送消息id：{},内容：{}", correlationData3.getId(), msg + "key1");
     }
 
 
     @GetMapping("/backupExchange/{msg}")
-    public void backupExhchange(@PathVariable String msg){
+    public void backupExhchange(@PathVariable String msg) {
         CorrelationData correlationData3 = new CorrelationData("backupExchange");
-        rabbitTemplate.convertAndSend("confirm_exchange","nokey",msg+"key1",correlationData3);
-        log.info("发送消息id：{},内容：{}",correlationData3.getId(),msg+"key1");
+        rabbitTemplate.convertAndSend("confirm_exchange", "nokey", msg + "key1", correlationData3);
+        log.info("发送消息id：{},内容：{}", correlationData3.getId(), msg + "key1");
     }
 
     @Override
     public void returnedMessage(Message message, int replyCode, String replyText, String exchange, String routingKey) {
-        log.info("消息：{}被退回，原因是：{}，交换机是：{}，routingKey是：{}",new String(message.getBody()),replyText,exchange,routingKey);
+        log.info("消息：{}被退回，原因是：{}，交换机是：{}，routingKey是：{}", new String(message.getBody()), replyText, exchange, routingKey);
     }
 
     @Override
     public void confirm(CorrelationData correlationData, boolean ack, String cause) {
-        String id = correlationData.getId();
-        if(ack){
-            log.info("交换机收到消息，id：{}",id);
-        }else{
-            log.info("交换机未收到消息id：{}，原因是：{}",id,cause);
+        String id = correlationData == null ? "" : correlationData.getId();
+        if (ack) {
+            log.info("交换机收到消息，id：{}", id);
+        } else {
+            log.info("交换机未收到消息id：{}，原因是：{}", id, cause);
         }
     }
 }

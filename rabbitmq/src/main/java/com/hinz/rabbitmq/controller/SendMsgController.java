@@ -47,4 +47,12 @@ public class SendMsgController {
         log.info("当前时间：{},发送消息成功：{}，过期时间：{}",new Date(),msg,ttlTime);
         return "ok";
     }
+
+
+    @GetMapping("sendBingds/{msg}")
+    public String sendBingds(@PathVariable String msg){
+        rabbitTemplate.convertAndSend("QQ","hinzzz.Aaa",msg);
+        log.info("当前时间：{},发送消息成功：{}",new Date());
+        return "ok";
+    }
 }
