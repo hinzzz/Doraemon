@@ -1,8 +1,107 @@
----
 
----
+
+
+
+
+
+
 
 ### RabbitMQ
+
+#### 安装与开发环境搭建
+
+##### 1、docker安装
+
+```shell
+docker pull rabbitmq:3.8.5-management
+
+docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 -v /mydata/rabbitmq/data:/var/lib/rabbitmq --hostname myRabbit -e RABBITMQ_DEFAULT_VHOST=my_vhost  -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAULT_PASS=admin rabbitmq:3.8.5-management
+```
+
+安装成功访问控制台http://IP:15672/
+
+![image-20210806151628237](http://hinzzz.oss-cn-shenzhen.aliyuncs.com/img/hinzzzimage-20210806151628237.png)
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.3.4.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>com.hinz</groupId>
+    <artifactId>rabbitmq</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>rabbitmq</name>
+    <description>RabbitMQ DEMO</description>
+
+    <properties>
+        <java.version>1.8</java.version>
+        <project.build.jdk>1.8</project.build.jdk>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.14</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.junit.vintage</groupId>
+                    <artifactId>junit-vintage-engine</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.amqp</groupId>
+            <artifactId>spring-rabbit-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+
+```
+
+
+
+
+
+
 
 #### 一、工作队列
 
@@ -2033,7 +2132,177 @@ public class WarningConsumer {
 
 
 
-#### 十、其他知识点
+#### 十、常用注解
+
+##### 1、@RabbitListener和@RabbitHandler
+
+```java
+@RabbitListener(bindings = @QueueBinding(
+        exchange = @Exchange(value = "QQ", durable = "true", type = "topic"),
+        value = @Queue(value = "WW", durable = "true"),
+        key = "hinzzz.#"
+))
+```
+
+​		用在方法上面，表明这个是个消费方法
+
+​		用在类上面，通过 @RabbitListener 的 bindings 属性声明 Binding（若 RabbitMQ 中不存在该绑定所需要的 Queue、Exchange、RouteKey 则自动创建，若存在则抛出异常）
+
+​		配合@RabbitHandler使用，@RabbitListener 标注在类上面表示当有收到消息的时候，就交给 @RabbitHandler 的方法处理，具体使用哪个方法处理，根据 MessageConverter 转换后的参数类型
+
+生产者
+
+```java
+ @GetMapping("sendUser/{msg}")
+    public String sendUser(@PathVariable String msg){
+        rabbitTemplate.convertAndSend("QQ","hinzzz.Aaa",msg);
+        rabbitTemplate.convertAndSend("QQ","hinzzz.Aaa", User.builder().userNo("1").userName(msg).build());
+        log.info("当前时间：{},发送消息成功：{}",new Date());
+        return "ok";
+    }
+
+```
+
+消费者
+
+```java
+package com.hinz.rabbitmq.consumer;
+
+import com.hinz.rabbitmq.bean.User;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.*;
+import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.stereotype.Component;
+
+import java.util.Map;
+
+@Component
+@Slf4j
+/**
+ * payload是一种以JSON格式进行数据传输的一种方式。
+ */
+@RabbitListener(bindings = @QueueBinding(
+        exchange = @Exchange(value = "QQ", durable = "true", type = "topic"),
+        value = @Queue(value = "WW", durable = "true"),
+        key = "hinzzz.#"
+))
+public class BindingsConsumer {
+
+
+    @RabbitHandler
+    public void consume(@Payload String msg) {
+        log.info("接收的参数为字符串类型：{}",msg);
+    }
+    @RabbitHandler
+    public void consume(@Payload User user) {
+        log.info("接收的参数为对象：{}",user);
+    }
+
+}
+
+```
+
+![image-20210806141808218](http://hinzzz.oss-cn-shenzhen.aliyuncs.com/img/hinzzzimage-20210806141808218.png)
+
+##### 
+
+#### 十一、消息序列化
+
+> 涉及数据网络传输的应用序列化不可避免，发送端以某种规则将消息转成byte数据进行发送，接收端以该规则进行byte[]数组的解析，RabbitMQ的序列化是只Message的body属性，即我们需要真正传输的内容。RabbitMQ抽象出一个MessageConvert 接口，处理消息的序列化。其实现有 SimpleMessageConverter（默认）、Jackson2JsonMessageConverter 等。
+
+##### 1、SimpleMessageConverter
+
+对于要发送的消息体 body 为 byte[] 时不进行处理，如果是 String 则转成字节数组,如果是 Java 对象，则使用 jdk 序列化将消息转成字节数组，转出来的结果较大，含class类名，类相应方法等信息。因此性能较差
+
+下面来看下发送的消息类型以及在控制台接收到我们发送的消息，可以看到当发送的消息是一个对象时，转出来的结果较大，浪费性能。
+
+```java
+rabbitTemplate.convertAndSend("QQ","hinzzz.Aaa",msg.getBytes(StandardCharsets.UTF_8)+" byte[]");
+rabbitTemplate.convertAndSend("QQ","hinzzz.Aaa",msg+" String");
+rabbitTemplate.convertAndSend("QQ","hinzzz.Aaa", User.builder().userNo("1").userName(msg).build());
+```
+
+
+
+![image-20210806143651790](http://hinzzz.oss-cn-shenzhen.aliyuncs.com/img/hinzzzimage-20210806143651790.png)
+
+
+
+
+
+##### 2、Jackson2JsonMessageConverter 
+
+> 为了解决上面对象序列化产生的问题，我们需要将默认的序列化实现改为Jackson2JsonMessageConverter 
+>
+> 注意：被序列化对象应提供一个无参的构造函数，否则会抛出异常
+
+
+
+```java
+
+package com.hinz.rabbitmq.config;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.listener.RabbitListenerContainerFactory;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * @author hinzzz
+ * @date 2021/8/6 10:13
+ * @desc
+ */
+@Slf4j
+@Configuration
+public class GlobalConfig {
+
+    @Bean
+    public RabbitListenerContainerFactory<?> rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
+        factory.setMessageConverter(new Jackson2JsonMessageConverter());
+        return factory;
+    }
+
+
+    @Bean
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+        RabbitTemplate template = new RabbitTemplate(connectionFactory);
+        template.setMessageConverter(new Jackson2JsonMessageConverter());
+        return template;
+    }
+
+}
+```
+
+我们再来发送一个对象看下控制台接收到的消息
+
+```java
+rabbitTemplate.convertAndSend("QQ","hinzzz.Aaa",msg.getBytes(StandardCharsets.UTF_8)+" byte[]");
+rabbitTemplate.convertAndSend("QQ","hinzzz.Aaa",msg+" String");
+rabbitTemplate.convertAndSend("QQ","hinzzz.Aaa", User.builder().userNo("1").userName(msg).build());
+```
+
+控制台可以看到user对象进行了json序列化，
+
+![image-20210806150024874](http://hinzzz.oss-cn-shenzhen.aliyuncs.com/img/hinzzzimage-20210806150024874.png)
+
+
+
+
+
+
+
+
+
+#### 十二、其他知识点
 
 ##### 1、幂等性
 

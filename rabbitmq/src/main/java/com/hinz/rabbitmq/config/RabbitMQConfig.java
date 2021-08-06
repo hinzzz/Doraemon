@@ -1,14 +1,18 @@
 package com.hinz.rabbitmq.config;
 
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+
 import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
+@Slf4j
 public class RabbitMQConfig {
 
     public static final String X_EXCHANGE = "X";
@@ -105,4 +109,7 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(queue).to(exchange).with("XC");
     }
 
+
+
 }
+
