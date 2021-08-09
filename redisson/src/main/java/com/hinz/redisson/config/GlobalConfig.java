@@ -17,7 +17,11 @@ public class GlobalConfig {
     @Bean(destroyMethod = "shutdown")
     public RedissonClient redissonClient(){
         Config config = new Config();
-        config.useSingleServer().setAddress("redis://www.xieguangda.top:6379");
+        config.useClusterServers()
+                .setCheckSlotsCoverage(false)
+                .addNodeAddress("redis://www.xieguangda.top:6379")
+                .addNodeAddress("redis://www.xieguangda.top:6380")
+                .addNodeAddress("redis://www.xieguangda.top:6381");
         return Redisson.create(config);
     }
 }

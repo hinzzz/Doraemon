@@ -2,8 +2,6 @@
 spring:
   application:
     name: redison
-  redis:
-    host: www.xieguangda.top
-    port: 6379
+
 
 
