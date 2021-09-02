@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class HelloRedisLockController {
 
 
-    @AopLock("#mobile")
+    @AopLock(value = "#mobile",leaseTime = 10000)
     @RequestMapping("/hello/{mobile}")
     public Object hello(@PathVariable String mobile){
         try {
-            Thread.sleep(20000);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

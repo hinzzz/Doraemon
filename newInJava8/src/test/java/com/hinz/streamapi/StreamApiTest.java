@@ -15,6 +15,7 @@ public class StreamApiTest {
 
     @Test
     public void fun1(){
+        
         List<Employee> emps = Arrays.asList(
                 new Employee(1,"hinzzz",18,100,null),
                 new Employee(1,"hinzzz",18,100,null),

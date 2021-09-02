@@ -64,7 +64,7 @@ public class SendMsgController {
     public String sendUser(@PathVariable String msg){
         rabbitTemplate.convertAndSend("QQ","hinzzz.Aaa",msg.getBytes(StandardCharsets.UTF_8)+" byte[]");
         rabbitTemplate.convertAndSend("QQ","hinzzz.Aaa",msg+" String");
-        rabbitTemplate.convertAndSend("QQ","hinzzz.Aaa", User.builder().userNo("1").userName(msg).build());
+        rabbitTemplate.convertAndSend("QQ","hinzzz.Aaa", User.builder().userNo("1").age(null).userName(msg).build());
         log.info("当前时间：{},发送消息成功：{}",new Date());
         return "ok";
     }

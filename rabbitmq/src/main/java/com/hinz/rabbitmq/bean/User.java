@@ -13,5 +13,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class User implements Serializable {
     private String userNo;
+    private Integer age;
     private String userName;
 }

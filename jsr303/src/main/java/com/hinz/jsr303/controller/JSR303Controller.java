@@ -9,6 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -61,6 +62,12 @@ public class JSR303Controller {
 
     @RequestMapping("testSingleParam")
     public R testSingleParam(@Validated @NotBlank(message = "name不能为空") String name, @Validated  @NotBlank(message = "id不能为空") String id){
+        log.info("name : "+name);
+        return R.ok();
+    }
+
+    @RequestMapping("testReq")
+    public R testSingleParam(@RequestParam String name){
         log.info("name : "+name);
         return R.ok();
     }
