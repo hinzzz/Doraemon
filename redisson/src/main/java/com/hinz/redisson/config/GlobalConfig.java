@@ -9,8 +9,11 @@ import org.redisson.config.SubscriptionMode;
 import org.redisson.connection.balancer.RoundRobinLoadBalancer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import redis.clients.jedis.HostAndPort;
+import redis.clients.jedis.JedisCluster;
 
-import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author hinzzz
@@ -22,8 +25,9 @@ import java.io.IOException;
 public class GlobalConfig {
 
     @Bean(destroyMethod = "shutdown")
-    public RedissonClient redissonClient(){
+    public RedissonClient redissonClient() {
         Config config = new Config();
+        //config.setLockWatchdogTimeout(5*1000);
         config.useClusterServers()
                 .setScanInterval(2000) // 集群状态扫描间隔时间，单位是毫秒 默认值： 5000
                 .setCheckSlotsCoverage(false)
@@ -31,7 +35,7 @@ public class GlobalConfig {
                 .addNodeAddress("redis://www.xieguangda.top:6380")//节点地址
                 .addNodeAddress("redis://www.xieguangda.top:6381")//节点地址
                 .setReadMode(ReadMode.SLAVE)//读取操作的负载均衡模式 默认：只在从服务节点里读取
-                    // 注：在从服务节点里读取的数据说明已经至少有两个节点保存了该数据，确保了数据的高可用性。
+                // 注：在从服务节点里读取的数据说明已经至少有两个节点保存了该数据，确保了数据的高可用性。
                 .setSubscriptionMode(SubscriptionMode.MASTER)//订阅操作的负载均衡模式 默认：只在从服务节点里订阅
                 .setLoadBalancer(new RoundRobinLoadBalancer())//负载均衡算法类的选择 默认： org.redisson.connection.balancer.RoundRobinLoadBalancer
                 //org.redisson.connection.balancer.WeightedRoundRobinBalancer - 权重轮询调度算法
@@ -43,8 +47,20 @@ public class GlobalConfig {
                 .setMasterConnectionPoolSize(64)
                 .setSlaveConnectionMinimumIdleSize(10)
                 .setSlaveConnectionPoolSize(64);
-                RedissonClient redisson = Redisson.create(config);
+        RedissonClient redisson = Redisson.create(config);
 
         return Redisson.create(config);
     }
+
+
+    @Bean
+    public JedisCluster jedisCluster() {
+        Set<HostAndPort> nodes = new HashSet<>();
+        nodes.add(new HostAndPort("www.xieguangda.top", 6379));
+        nodes.add(new HostAndPort("www.xieguangda.top", 6380));
+        nodes.add(new HostAndPort("www.xieguangda.top", 6381));
+
+        return new JedisCluster(nodes);
+    }
+
 }

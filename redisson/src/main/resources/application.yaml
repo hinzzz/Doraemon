@@ -2,6 +2,10 @@
 spring:
   application:
     name: redison
-
-
+  redis:
+    cluster:
+      nodes:
+        - www.xieguangda.top:6379
+        - www.xieguangda.top:6380
+        - www.xieguangda.top:6381
 

@@ -99,6 +99,7 @@ public class TestStreamAPI3 {
 			.map(Employee::getSalary)
 			.collect(Collectors.maxBy(Double::compare));
 
+
 		System.out.println(max.get());
 
 		Optional<Employee> op = emps.stream()

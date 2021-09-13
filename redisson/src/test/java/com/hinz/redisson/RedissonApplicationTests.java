@@ -9,9 +9,7 @@ import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 //@SpringBootTest
@@ -19,6 +17,9 @@ class RedissonApplicationTests {
 
     @Autowired
     private RedissonClient redissonClient;
+
+
+
 
     @Test
     void contextLoads() throws Exception{
