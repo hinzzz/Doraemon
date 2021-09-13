@@ -12,17 +12,42 @@ import java.util.List;
  */
 public class ShareTest {
 
+    /**
+     * 1、为什么要求谨慎使用 ArrayList 中的 subList 方法？
+     */
     @Test
-    public void subList(){
-        List<Integer> list = new ArrayList<>();
-        list.add(1);
-        list.add(2);
-        list.add(3);
-        //ArrayList<Integer> cast = (ArrayList)list;
-        //ArrayList<Integer> subList = (ArrayList)list.subList(0, 2);
-        List<Integer> subList = list.subList(0, 2);
-        //cast.add(4);
-        subList.add(4);
+    public void subListCast(){
+        List<String> names = new ArrayList<String>() {{
+            add("11");
+            add("22");
+            add("33");
+            add("44");
+        }};
+
+        List subList = names.subList(0, 2);
+        System.out.println(subList);
+
+        ArrayList subList1 = (ArrayList) names.subList(0, 2);
+        System.out.println(subList);
+    }
+
+
+    /**
+     * 对结果集进行操作
+     */
+    @Test
+    public void subListEdit(){
+        List<String> names = new ArrayList<String>() {{
+            add("11");
+            add("22");
+            add("33");
+        }};
+
+        List subList = names.subList(0, 2);
+        System.out.println(subList);
+        subList.add("44");
+        System.out.println("subList = " + subList);
+        System.out.println("names = " + names);
     }
 }
 
