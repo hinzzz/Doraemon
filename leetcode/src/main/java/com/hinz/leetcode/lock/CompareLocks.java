@@ -10,12 +10,13 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * 比较不同锁机制的速度
  * 结论：synchronized最慢，semaphore与reentrantLock相近，atomic在自加自减方面最快
- * @author holien
- * @create_Time 2017年9月19日 下午12:38:07
+ * @author hinzzz
+ * @date 2021/9/8 16:43
+ * @desc
  */
 public class CompareLocks {
 	static int threadNum = 8;
-	static int addTime = 10000000; // 自加次数
+	static int addTime = 1000000; // 自加次数
 	static int countWithSema = 0;
 	static int countWithSyn = 0;
 	static int countWithReen = 0;
