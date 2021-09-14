@@ -43,6 +43,7 @@ public class UserInfo {
      * 校验嵌套级联属性必须在属性上加@Valid
      */
     @Valid
+    @Size(min = 1)
     @NotNull(message = "地址列表不能为空",groups = {ValidatorGroup.Update.class})
     private List<AddressInfo> addressInfos;
 

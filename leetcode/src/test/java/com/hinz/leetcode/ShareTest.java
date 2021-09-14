@@ -33,7 +33,7 @@ public class ShareTest {
 
 
     /**
-     * 对结果集进行操作
+     * 2、对结果集进行操作
      */
     @Test
     public void subListEdit(){
@@ -48,6 +48,24 @@ public class ShareTest {
         subList.add("44");
         System.out.println("subList = " + subList);
         System.out.println("names = " + names);
+    }
+
+    /**
+     * 3、对原list进行操作
+     */
+    @Test
+    public void sourceListEdit(){
+        List<String> sourceList = new ArrayList<String>() {{
+            add("11");
+            add("22");
+            add("33");
+        }};
+
+        List subList = sourceList.subList(0, 2);
+        System.out.println(subList);
+        sourceList.add("44");
+        System.out.println("subList = " + subList);
+        System.out.println("names = " + sourceList);
     }
 }
 

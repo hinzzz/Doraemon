@@ -1,15 +1,10 @@
 package com.hinz.streamapi;
 
-import java.util.Arrays;
-import java.util.DoubleSummaryStatistics;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.hinz.bean.Employee;
+import com.hinz.bean.Person;
 import org.junit.Test;
 
 
@@ -139,6 +134,25 @@ public class TestStreamAPI3 {
 		System.out.println(map);
 	}
 
+	//分组+排序
+	@Test
+	public void test55(){
+		List<Person> lists = new ArrayList<Person>(){{
+			add(Person.builder().name("z3").age(10).build());
+			add(Person.builder().name("l4").age(11).build());
+			add(Person.builder().name("w5").age(10).build());
+			add(Person.builder().name("z6").age(13).build());
+			add(Person.builder().name("z66").age(9).build());
+			add(Person.builder().name("hinzzz").age(101).build());
+		}};
+
+		HashMap<Integer, List<Person>> collect = lists.stream().sorted((a, b) -> {
+			return a.getAge() - b.getAge();
+		}).collect(Collectors.groupingBy(Person::getAge,HashMap::new,Collectors.toList()));
+
+		System.out.println("collect = " + collect.keySet());
+	}
+
 	//多级分组
 	@Test
 	public void test6(){
@@ -183,3 +197,4 @@ public class TestStreamAPI3 {
 		System.out.println(sum.get());
 	}
 }
+
