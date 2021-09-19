@@ -24,7 +24,7 @@ import java.util.Date;
 import java.util.List;
 
 @Slf4j
-//@SpringBootTest
+@SpringBootTest
 class MybatisApplicationTests {
 
 	@Resource

@@ -1,10 +1,13 @@
 package com.hinz.leetcode;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author hinzzz
@@ -39,17 +42,16 @@ public class ShareTest {
      */
     @Test
     public void subListEdit(){
-        List<String> names = new ArrayList<String>() {{
-            add("11");
-            add("22");
-            add("33");
+        List<Integer> list = new ArrayList<Integer>() {{
+            add(1);
+            add(2);
+            add(3);
         }};
 
-        List subList = names.subList(0, 2);
-        System.out.println(subList);
-        subList.add("44");
-        System.out.println("subList = " + subList);
-        System.out.println("names = " + names);
+        List subList = list.subList(0, 2);
+        subList.add(4);
+        System.out.println("subList = " + subList);//1,2,3
+        System.out.println("list = " + list);//1,2,3,4
     }
 
     /**
@@ -72,31 +74,41 @@ public class ShareTest {
 
 
     @Test
-    public void logTest(){
-        log.info("aaa");
-        log.debug("aaa:{}","bb");
-        log.warn("aaa");
+    public void Comparator (){
+        List<Student> list = new ArrayList<Student>(){{
+            add(Student.builder().age(14).name("z3").build());
+            add(Student.builder().age(11).name("l4").build());
+            add(Student.builder().age(10).name("w5").build());
+            add(Student.builder().age(13).name("z7").build());
+            add(Student.builder().age(11).name("s8").build());
+            add(Student.builder().age(11).name("s8").build());
+            add(Student.builder().age(11).name("s8").build());
+            add(Student.builder().age(13).name("s8").build());
+            add(Student.builder().age(11).name("s8").build());
+            add(Student.builder().age(14).name("s8").build());
+            add(Student.builder().age(11).name("s8").build());
+
+        }};
+
+        Collections.sort(list,(a,b)->{
+           return a.getAge() > b.getAge() ? 1 : -1;
+        });
+        System.out.println("list = " + list);
+
+        Student[] students = list.toArray(new Student[list.size()]);
+        Arrays.sort(students,(a,b)->{
+            return a.getAge() > b.getAge() ? 1 : -1;
+        });
+        Arrays.stream(students).forEach(System.out::println);
     }
 }
 
-/**
- *create table smth1 (
- *  　　id int auto_increment ,
- *  　　ver int(11) default null,
- * 　　 content varchar(1000) not null,
- *  　　intro varchar(1000) not null,
- *  　　primary key(id),
- *  　　key idver(id,ver)
- * )engine = innodb default charset = utf8;
- *
- *
- *
- * create procedure smthTest1()
- * begin
- * 　　declare num int default 100001;
- * 　　while num < 1000000 do
- * 　　set num := num +1;
- * 　　insert into smth1 values (num ,num,'我是*****','我是谁');
- * 　　end while ;
- * end;
- */
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@Builder
+class Student {
+    private Integer age;
+    private String name;
+}
+

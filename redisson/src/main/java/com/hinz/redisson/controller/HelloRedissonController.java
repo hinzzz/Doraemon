@@ -100,7 +100,7 @@ public class HelloRedissonController {
         return "xx";
     }
 
-    /*@RequestMapping("/park")
+    @RequestMapping("/park")
     @ResponseBody
     public String park() {
         RSemaphore semaphore = redissonClient.getSemaphore("car");
@@ -118,14 +118,14 @@ public class HelloRedissonController {
         RSemaphore semaphore = redissonClient.getSemaphore("car");
         semaphore.release();
         return "leave success";
-    }*/
+    }
 
     /**
      * 车库停车
      * 三个车位
      * @return
      */
-    @RequestMapping("/park")
+    /*@RequestMapping("/park")
     @ResponseBody
     public String park() {
         RSemaphore semaphore = redissonClient.getSemaphore("car");
@@ -139,7 +139,7 @@ public class HelloRedissonController {
         RSemaphore semaphore = redissonClient.getSemaphore("car");
         semaphore.release();
         return "leave success";
-    }
+    }*/
 
     /**
      * 学校放假锁门 5个班级的人全部走完 才能锁门
