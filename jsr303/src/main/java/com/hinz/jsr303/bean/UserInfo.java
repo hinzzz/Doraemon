@@ -1,5 +1,6 @@
 package com.hinz.jsr303.bean;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hinz.jsr303.valid.IntValue;
 import com.hinz.jsr303.valid.ValidatorGroup;
 import lombok.Builder;
@@ -7,6 +8,8 @@ import lombok.Data;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
+import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -16,27 +19,27 @@ import java.util.List;
  */
 @Data
 @Builder
-public class UserInfo {
+public class UserInfo implements Serializable {
 
-    @NotNull(message = "修改必须指定id",groups = {ValidatorGroup.Update.class})
-    @Null(message = "新增不能指定id",groups = {ValidatorGroup.Insert.class})
+    @NotNull(message = "修改必须指定id",groups = {ValidatorGroup.Edit.class})
+    @Null(message = "新增不能指定id",groups = {ValidatorGroup.Add.class})
     private Long id;
 
     @Null(message = "用户名不能为空")
     private String userName;
 
-    @NotNull(message = "年龄不能为空",groups = {ValidatorGroup.Insert.class})
-    @Min(value = 1,message = "年龄必须大于1",groups = {ValidatorGroup.Insert.class,ValidatorGroup.Update.class})
+    @NotNull(message = "年龄不能为空",groups = {ValidatorGroup.Add.class})
+    @Min(value = 1,message = "年龄必须大于1",groups = {ValidatorGroup.Add.class,ValidatorGroup.Edit.class})
     private Integer age;
 
-    @NotEmpty(message = "手机号不能为空",groups = {ValidatorGroup.Insert.class})
+    @NotEmpty(message = "手机号不能为空",groups = {ValidatorGroup.Add.class})
     @Pattern(regexp = "^(1)\\d{10}$",message = "手机号格式错误")
     private String mobileNo;
 
-    @IntValue(accessVals = {1,2},groups = {ValidatorGroup.Update.class})
+    @IntValue(accessVals = {1,2},groups = {ValidatorGroup.Edit.class})
     private Integer gender;
 
-    @NotBlank(groups = {ValidatorGroup.Insert.class})
+    @NotBlank(groups = {ValidatorGroup.Add.class})
     private String homeUrl;
 
     /**
@@ -44,7 +47,7 @@ public class UserInfo {
      */
     @Valid
     @Size(min = 1)
-    @NotNull(message = "地址列表不能为空",groups = {ValidatorGroup.Update.class})
+    @NotNull(message = "地址列表不能为空",groups = {ValidatorGroup.Edit.class})
     private List<AddressInfo> addressInfos;
 
     @AssertTrue
@@ -52,5 +55,8 @@ public class UserInfo {
 
     @Email
     private String email;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    private Date birthday;
 
 }

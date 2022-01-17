@@ -1,15 +1,33 @@
 package com.hinz.leetcode;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import lombok.Builder;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 //@SpringBootTest
+@Slf4j
 class LeetcodeApplicationTests {
 
     @Test
     void contextLoads() {
     }
+
+    @Test
+    void fun1(){
+        List<String> list = new ArrayList<>();
+        String join = StringUtils.join(list, "");
+        System.out.println("join = " + join);
+    }
+
+
 
 
     @Test
@@ -122,3 +140,12 @@ class LeetcodeApplicationTests {
         return max;
     }
 }
+
+@Builder
+@Data
+class AdditionServiceSubVo{
+    private List<AdditionServiceSubVo> childAdditionServiceVo;
+    private Integer serviceSubjectCode;
+}
+
+

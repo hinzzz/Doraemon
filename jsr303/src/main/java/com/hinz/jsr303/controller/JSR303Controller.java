@@ -36,13 +36,13 @@ public class JSR303Controller {
     }
 
     @RequestMapping("add")
-    public R add( @Validated({ValidatorGroup.Insert.class}) @RequestBody UserInfo userInfo){
+    public R add( @Validated({ValidatorGroup.Add.class}) @RequestBody UserInfo userInfo){
         log.info(userInfo.toString());
         return R.ok();
     }
 
     @RequestMapping("update")
-    public R update(@RequestBody @Validated({ValidatorGroup.Update.class}) UserInfo userInfo){
+    public R update(@RequestBody @Validated({ValidatorGroup.Edit.class}) UserInfo userInfo){
         log.info(userInfo.toString());
         return R.ok();
     }
@@ -71,4 +71,11 @@ public class JSR303Controller {
         log.info("name : "+name);
         return R.ok();
     }
+
+    @RequestMapping("saveUser")
+    public R testSingleParam(@RequestBody UserInfo userInfo){
+        log.info("name : "+userInfo);
+        return R.ok();
+    }
+
 }

@@ -17,9 +17,6 @@ logging:
 
 
 
-
-
-
 spring:
   datasource:
     write:
@@ -37,10 +34,10 @@ spring:
       jackson:
       date-format: yyyy-MM-dd HH:mm:ss
 
-# æœåŠ¡æ¨¡å—
+# ·şÎñÄ£¿é
 devtools:
   restart:
-    # çƒ­éƒ¨ç½²å¼€å…³
+    # ÈÈ²¿Êğ¿ª¹Ø
     enabled: true
 
 

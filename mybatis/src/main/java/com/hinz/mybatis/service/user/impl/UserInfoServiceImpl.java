@@ -46,4 +46,9 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         userInfoMapper.insert(other);
         userInfoMapper.insert(hinz);
     }
+
+    @Override
+    public UserInfo testHandler(long l) {
+        return userInfoMapper.testHandler(l);
+    }
 }

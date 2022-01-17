@@ -12,10 +12,20 @@ import java.util.stream.Collectors;
  * @Description : No Description
  */
 public class StreamApiTest {
+    @Test
+    public void testBoolean(){
+        Integer a = 1;
+        fun(a);
+    }
+
+
+    public void fun(int a){
+        int b = 1/0;
+    }
 
     @Test
     public void fun1(){
-        
+
         List<Employee> emps = Arrays.asList(
                 new Employee(1,"hinzzz",18,100,null),
                 new Employee(1,"hinzzz",18,100,null),
@@ -35,10 +45,10 @@ public class StreamApiTest {
     @Test
     public void collect(){
         List<Employee> emps = Arrays.asList(
-                new Employee(1,"hinzzz",18,100,null),
-                new Employee(1,"hinzzz",18,100,null),
-                new Employee(1,"zs",19,200,null),
-                new Employee(1,"l4",20,500,null));
+                new Employee(1,"hinzzz",33,100,null),
+                new Employee(1,"hinzzz",44,80,null),
+                new Employee(1,"zs",20,200,null),
+                new Employee(1,"l4",21,500,null));
         //把流中元素收集到List中
         List<Employee> collect = emps.stream().collect(Collectors.toList());
         System.out.println("collect = " + collect);
@@ -88,9 +98,9 @@ public class StreamApiTest {
         System.out.println("collect11 = " + collect11);
 
         //根据某个属性值对流进行分组，属性为k，值为value
-        Map<String, List<Employee>> collect12 = emps.stream().collect(Collectors.groupingBy(Employee::getName));
+        Map<String, List<Employee>> collect12 = emps.stream().
+                collect(Collectors.groupingBy(Employee::getName));
         System.out.println("collect12 = " + collect12);
-
         //根据true、false进行分组
         Map<Boolean, List<Employee>> collect13 = emps.stream().collect(Collectors.partitioningBy((emp) -> {
             return emp.getAge() == 20;

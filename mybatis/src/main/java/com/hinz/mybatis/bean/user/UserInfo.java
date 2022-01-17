@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.hinz.mybatis.handler.ArrayTypeHandler;
 import lombok.*;
 
 /**
@@ -16,6 +18,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@TableName(autoResultMap = true)
 public class UserInfo implements Serializable {
     private Long id;
 

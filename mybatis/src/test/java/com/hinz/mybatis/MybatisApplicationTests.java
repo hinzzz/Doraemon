@@ -37,12 +37,11 @@ class MybatisApplicationTests {
 	void contextLoads() {
 	}
 
-
 	@Test
-	void fun6(){
-		for (int i = 1; i <= 10; i++) {
-			System.out.println( "A" + i +"      "+"B" + (i+10));
-		}
+	void handler(){
+		UserInfo userInfoAddress = userInfoService.getById(1);
+//		UserInfo userInfoAddress = userInfoService.testHandler(1L);
+		System.out.println("userInfoAddress = " + userInfoAddress);
 	}
 
 

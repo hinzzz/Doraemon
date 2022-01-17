@@ -29,4 +29,5 @@ public interface UserInfoService extends IService<UserInfo> {
 
     void testTransaction();
 
+    UserInfo testHandler(long l);
 }
