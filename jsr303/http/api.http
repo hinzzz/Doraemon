@@ -5,10 +5,11 @@ Content-Type: application/json
 {
   "id": 1,
   "userName": "123123",
-  "age": null,
-  "mobileNo": null,
+  "age": 12,
+  "mobileNo": "15989197190",
   "gender": 3,
-  "homeUrl": "12312312"
+  "homeUrl": "12312312",
+  "anEnum": "1"
 }
 
 ### 新增分组校验

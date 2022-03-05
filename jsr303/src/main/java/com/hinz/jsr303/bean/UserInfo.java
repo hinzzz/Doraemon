@@ -5,6 +5,7 @@ import com.hinz.jsr303.valid.IntValue;
 import com.hinz.jsr303.valid.ValidatorGroup;
 import lombok.Builder;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -25,7 +26,7 @@ public class UserInfo implements Serializable {
     @Null(message = "新增不能指定id",groups = {ValidatorGroup.Add.class})
     private Long id;
 
-    @Null(message = "用户名不能为空")
+    @NotEmpty(message = "用户名不能为空")
     private String userName;
 
     @NotNull(message = "年龄不能为空",groups = {ValidatorGroup.Add.class})
@@ -59,4 +60,6 @@ public class UserInfo implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date birthday;
 
+    @Null
+    private ChangeColumnTypeEnum anEnum;
 }
