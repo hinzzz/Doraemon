@@ -23,13 +23,14 @@ public class MainUtils {
                 " | '_ \\  | | | '_ \\  |_  / |_  / |_  /\n" +
                 " | | | | | | | | | |  / /   / /   / /\n" +
                 " |_| |_| |_| |_| |_| /___| /___| /___|\n");
+        Arrays.stream(args).forEach(System.out::println);
         MainUtils.run();
 
     }
     public static void run(){
         System.out.println("===========请选择工具 输入序号既可 输入q退出 ===========");
         ALiUtil.toUpload();
-        /*System.out.println(utils);
+        System.out.println(utils);
         Scanner in = new Scanner(System.in);
         while (true){
             System.out.print("请输入序号：");
@@ -49,7 +50,7 @@ public class MainUtils {
                     DecUtil.dec();
                     return;
             }
-        }*/
+        }
     }
 
 
